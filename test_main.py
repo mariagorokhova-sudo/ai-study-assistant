@@ -56,11 +56,11 @@ def test_view_history():
                         "answer": "Inheritance allows a class to inherit from another class."
                     }
                 ]
-                mock_input.side_effect = ["5", "6"]
+                mock_input.side_effect = ["5", "1", "6"]
 
                 main.main()
 
-                mock_print.assert_any_call("Topic: classes")
+                mock_print.assert_any_call("\nTopic: classes")
                 mock_print.assert_any_call("Question: what is inheritance?")
                 mock_print.assert_any_call("Answer: Inheritance allows a class to inherit from another class.")
 
@@ -69,9 +69,38 @@ def test_view_empty_history():
         with patch("main.history.list_history_entries") as mock_list_history:
             with patch("builtins.print") as mock_print:
                 mock_list_history.return_value = []
-                mock_input.side_effect = ["5", "6"]
+                mock_input.side_effect = ["5", "1", "6"]
 
                 main.main()
 
                 mock_print.assert_any_call("No history yet!")
+
+def test_view_filtered_history():
+    with patch("history.get_history_by_topic") as mock_history_by_topic:
+        with patch("builtins.input", side_effect = ["5", "2", "classes", "6"]):
+            with patch("builtins.print") as mock_print:
+                mock_history_by_topic.return_value = [
+                    {
+                        "topic": "classes",
+                        "question": "what is inheritance?",
+                        "answer": "Inheritance allows a class to inherit from another class."
+                    }
+                ]
+
+                main.main()
+
+                mock_history_by_topic.assert_called_once_with(main.data, "classes")
+
+                mock_print.assert_any_call("\nTopic: classes")
+                mock_print.assert_any_call("Question: what is inheritance?")
+                mock_print.assert_any_call("Answer: Inheritance allows a class to inherit from another class.")
+
+def test_view_history_invalid_input():
+    with patch("builtins.input", side_effect = ["5", "7", "6"]):
+        with patch("builtins.print") as mock_print:
+            main.main()
+            mock_print.assert_any_call("Invalid option!")
+
+
+            
 

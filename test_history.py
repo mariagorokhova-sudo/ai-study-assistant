@@ -108,4 +108,71 @@ def test_list_history_entries_when_empty():
 
     assert entries == []
 
+def test_get_history_by_topic():
+
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": [
+            {
+                "topic": "classes",
+                "question": "what is inheritance?",
+                "answer": "Inheritance allows a class to inherit from another class."
+            },
+            {
+                "topic": "recursion",
+                "question": "what is a base case?",
+                "answer": "A **base case** tells a recursive function when to stop calling itself."
+            },
+            {
+                "topic": "recursion",
+                "question": "why do we need a base case?",
+                "answer": "Without one, the function would keep calling itself forever, eventually causing an error."
+            }
+        ]
+    }
+
+    result = history.get_history_by_topic(data, "recursion")
+
+    assert result == [
+            {
+                "topic": "recursion",
+                "question": "what is a base case?",
+                "answer": "A **base case** tells a recursive function when to stop calling itself."
+            },
+            {
+                "topic": "recursion",
+                "question": "why do we need a base case?",
+                "answer": "Without one, the function would keep calling itself forever, eventually causing an error."
+            }
+    ]
+
+def test_get_history_no_such_topic():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": [
+            {
+                "topic": "classes",
+                "question": "what is inheritance?",
+                "answer": "Inheritance allows a class to inherit from another class."
+            }
+        ]
+    }
+
+    result = history.get_history_by_topic(data, "recursion")
+
+    assert result == []
+
+
 

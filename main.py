@@ -59,14 +59,28 @@ def main():
                 print("Sorry, the AI request failed. Please try again.")
 
         elif choice == "5":
-            entries_list = history.list_history_entries(data)
+            print("\n1. View all history")
+            print("2. View history on specific topic")
+            choice_history = input("Please choose an option: ").strip()
+            if choice_history == "1":
+                entries_list = history.list_history_entries(data)
+                
+            elif choice_history == "2":
+                topic = input("Please enter a topic name: ")
+                entries_list = history.get_history_by_topic(data, topic)
+            
+            else:
+                print("Invalid option!")
+                continue
+
             if not entries_list:
-                print("No history yet!")
+                    print("No history yet!")
             else:
                 for entry in entries_list:
-                    print(f"Topic: {entry['topic']}")
+                    print(f"\nTopic: {entry['topic']}")
                     print(f"Question: {entry['question']}")
                     print(f"Answer: {entry['answer']}")
+
             
         
         elif choice == "6":
