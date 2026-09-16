@@ -48,13 +48,31 @@ def main():
                 print("Topic not found!")
 
         elif choice == "4":
-            topic = input("Please enter your topic: ")
+            topic_names = topics.list_topics(data)
+            for i in range (1, len(topic_names)+1):
+                print(f"{i}. {topic_names[i-1]}.")
+            last_option = len(topic_names)+1
+            print(f"{last_option}. Other.")
+            try:
+                topic_choice = int(input("Please enter a topic number: "))
+            except ValueError:
+                print("Invalid option!")
+                continue
+            
+            if topic_choice > last_option or topic_choice < 1:
+                print("Invalid option!")
+                continue
+            elif topic_choice == last_option:
+                topic = input("Please enter a topic name: ")
+            else:
+                topic = topic_names[topic_choice - 1]
+            
             question = input("Please enter your question: ")
             previous_history = history.get_history_by_topic(data, topic)
 
             try:
                 answer = ai.ask_about_topic(topic, question, previous_history)
-                print(answer)
+                print(f"\n{answer}")
                 history.add_history_entry(data, topic, question, answer)
             except openai.APIError:
                 print("Sorry, the AI request failed. Please try again.")

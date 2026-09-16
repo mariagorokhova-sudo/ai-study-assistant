@@ -14,7 +14,7 @@ def add_topic(data, name):
         "notes": ""
     }
     for topic in data["topics"]:
-        if topic["name"] == new_topic["name"]:
+        if topic["name"].lower() == new_topic["name"].lower():
             return False, "duplicate"
 
     data["topics"].append(new_topic)

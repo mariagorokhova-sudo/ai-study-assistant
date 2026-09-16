@@ -45,6 +45,33 @@ def test_add_duplicate_topic():
                 }
         mock_save.assert_not_called()
 
+def test_add_duplicate_topic_different_case():
+    data = {
+        "topics": [
+            {
+                "name": "classes",
+                "status": "new",
+                "notes": ""
+            }
+        ]
+    }
+
+    with patch("topics.storage.save_topics") as mock_save:
+        added, reason = topics.add_topic(data, "Classes")
+
+        assert added is False
+        assert reason == "duplicate"
+        assert data == {
+                    "topics": [
+                        {
+                            "name": "classes",
+                            "status": "new",
+                            "notes": ""
+                        }
+                    ]
+                }
+        mock_save.assert_not_called()
+
 def test_add_empty_topic():
     data = {
         "topics": [
