@@ -40,3 +40,14 @@ def test_build_prompt_empty_history():
 
     assert "algorithms" in prompt
     assert "what is binary search?" in prompt
+
+def test_build_prompt_limit_history_to_last_five():
+    previous_history = []
+    for i in range(1,7):
+        entry = {"topic": "recursion", "question": f'question {i}', "answer": f'answer {i}'}
+        previous_history.append(entry)
+
+    prompt = ai.build_prompt("recursion", "new question", previous_history)
+
+    assert "question 1" not in prompt
+    assert "question 6" in prompt

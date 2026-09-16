@@ -13,7 +13,7 @@ client = OpenAI(api_key=api_key)
 
 def build_prompt(topic, question, previous_history):
     history_text = ""
-    for entry in previous_history:
+    for entry in previous_history[-5:]:
          history_text += f"""Question: {entry["question"]}\nAnswer: {entry["answer"]}\n\n"""
     prompt = f"""
     I am a first-year Computer Science student learning a new topic: {topic}.
