@@ -1,4 +1,5 @@
 import storage
+import history
 
 def load_data():
     return storage.load_topics()
@@ -36,3 +37,8 @@ def delete_topic(data, name):
             storage.save_topics(data)
             return True, "deleted"
     return False, "not found"
+
+def get_topics_not_discussed_with_ai(data):
+    all_topics = set(list_topics(data))
+    asked_topics = history.get_unique_history_topics(data)
+    return all_topics - asked_topics

@@ -161,4 +161,48 @@ def test_delete_empty_topic():
 
         mock_save.assert_not_called()
 
+def test_get_topics_not_discussed_with_ai():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            },
+            {
+                "name": "classes",
+                "status": "new",
+                "notes": ""
+            },
+            {
+                "name": "algorithms",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": [
+            {
+                "topic": "classes",
+                "question": "what is inheritance?",
+                "answer": "Inheritance allows a class to inherit from another class."
+            },
+            {
+                "topic": "recursion",
+                "question": "what is a base case?",
+                "answer": "A **base case** tells a recursive function when to stop calling itself."
+            },
+            {
+                "topic": "recursion",
+                "question": "why do we need a base case?",
+                "answer": "Without one, the function would keep calling itself forever, eventually causing an error."
+            }
+        ]
+    }
+
+    topics_not_discussed_with_ai = topics.get_topics_not_discussed_with_ai(data)
+
+    assert topics_not_discussed_with_ai == {"algorithms"}
+
+
+
 

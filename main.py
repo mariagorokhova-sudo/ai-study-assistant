@@ -50,9 +50,10 @@ def main():
         elif choice == "4":
             topic = input("Please enter your topic: ")
             question = input("Please enter your question: ")
+            previous_history = history.get_history_by_topic(data, topic)
 
             try:
-                answer = ai.ask_about_topic(topic, question)
+                answer = ai.ask_about_topic(topic, question, previous_history)
                 print(answer)
                 history.add_history_entry(data, topic, question, answer)
             except openai.APIError:
@@ -61,6 +62,8 @@ def main():
         elif choice == "5":
             print("\n1. View all history")
             print("2. View history on specific topic")
+            print("3. View question counts by topic")
+
             choice_history = input("Please choose an option: ").strip()
             if choice_history == "1":
                 entries_list = history.list_history_entries(data)
@@ -68,6 +71,13 @@ def main():
             elif choice_history == "2":
                 topic = input("Please enter a topic name: ")
                 entries_list = history.get_history_by_topic(data, topic)
+
+            elif choice_history == "3":
+                topic_counts = history.count_history_by_topics(data)
+                counts_sorted = history.sort_topics_counts_descending(topic_counts)
+                for topic, count in counts_sorted:
+                    print(f"{topic}: {count}")
+                continue
             
             else:
                 print("Invalid option!")

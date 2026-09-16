@@ -174,5 +174,120 @@ def test_get_history_no_such_topic():
 
     assert result == []
 
+def test_count_history_by_topics():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": [
+            {
+                "topic": "classes",
+                "question": "what is inheritance?",
+                "answer": "Inheritance allows a class to inherit from another class."
+            },
+            {
+                "topic": "recursion",
+                "question": "what is a base case?",
+                "answer": "A **base case** tells a recursive function when to stop calling itself."
+            },
+            {
+                "topic": "recursion",
+                "question": "why do we need a base case?",
+                "answer": "Without one, the function would keep calling itself forever, eventually causing an error."
+            }
+        ]
+    }
+
+    result = history.count_history_by_topics(data)
+
+    assert result == {"recursion": 2, "classes": 1}
+
+def test_sort_topics_counts_descending():
+    counts = {
+        "recursion": 2,
+        "classes": 1,
+        "functions": 5
+    }
+
+    counts_sorted = history.sort_topics_counts_descending(counts)
+
+    assert counts_sorted == [
+        ("functions", 5),
+        ("recursion", 2),
+        ("classes", 1)
+    ]
+
+def test_sort_topics_counts_empty():
+    counts = {}
+    counts_sorted = history.sort_topics_counts_descending(counts)
+    assert counts_sorted == []
+
+def test_sort_topics_counts_equal():
+    counts = {
+        "recursion": 3,
+        "classes": 3,
+        "functions": 1
+    }
+
+    counts_sorted = history.sort_topics_counts_descending(counts)
+
+    assert counts_sorted == [
+        ("classes", 3),
+        ("recursion", 3),
+        ("functions", 1)
+    ]
+
+def test_get_unique_history_topics():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": [
+            {
+                "topic": "classes",
+                "question": "what is inheritance?",
+                "answer": "Inheritance allows a class to inherit from another class."
+            },
+            {
+                "topic": "recursion",
+                "question": "what is a base case?",
+                "answer": "A **base case** tells a recursive function when to stop calling itself."
+            },
+            {
+                "topic": "recursion",
+                "question": "why do we need a base case?",
+                "answer": "Without one, the function would keep calling itself forever, eventually causing an error."
+            }
+        ]
+    }
+
+    history_topics_set = history.get_unique_history_topics(data)
+
+    assert history_topics_set == {"recursion", "classes"}
+
+def test_get_unique_history_topics_empty():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ],
+        "history": []
+    }
+
+    history_topics_set = history.get_unique_history_topics(data)
+
+    assert history_topics_set == set()
 
 
+    
