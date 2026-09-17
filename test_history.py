@@ -152,6 +152,29 @@ def test_get_history_by_topic():
             }
     ]
 
+def test_get_history_by_topic_different_case():
+
+    data = {
+        "topics": [],
+        "history": [
+            {
+                "topic": "Binary Trees",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            }
+        ]
+    }
+
+    result = history.get_history_by_topic(data, "binary trees")
+
+    assert result == [
+        {
+            "topic": "Binary Trees",
+            "question": "what is a binary tree?",
+            "answer": "A binary tree is a..."
+        }
+    ]
+
 def test_get_history_no_such_topic():
     data = {
         "topics": [
@@ -205,6 +228,32 @@ def test_count_history_by_topics():
     result = history.count_history_by_topics(data)
 
     assert result == {"recursion": 2, "classes": 1}
+
+def test_count_history_by_topics_different_case():
+    data = {
+        "topics": [],
+        "history": [
+            {
+                "topic": "Binary Trees",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            },
+            {
+                "topic": "binary trees",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            },
+            {
+                "topic": "BINARY TREES",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            }
+        ]
+    }
+
+    result = history.count_history_by_topics(data)
+
+    assert result == {"Binary Trees": 3}
 
 def test_sort_topics_counts_descending():
     counts = {
@@ -288,6 +337,49 @@ def test_get_unique_history_topics_empty():
     history_topics_set = history.get_unique_history_topics(data)
 
     assert history_topics_set == set()
+
+def test_get_unique_history_topics_different_case():
+    data = {
+        "topics": [],
+        "history": [
+            {
+                "topic": "Binary Trees",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            },
+            {
+                "topic": "binary trees",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            },
+            {
+                "topic": "BINARY TREES",
+                "question": "what is a binary tree?",
+                "answer": "A binary tree is a..."
+            }
+        ]
+    }
+
+    history_topics_set = history.get_unique_history_topics(data)
+
+    assert history_topics_set == {"Binary Trees"}
+
+def test_find_matching_topic_case_insensitive():
+    topic = "binary trees"
+    exisitng_topics = {"Recursion", "Binary Trees"}
+
+    result = history.find_matching_topic_case_insensitive(topic, exisitng_topics)
+    assert result == "Binary Trees"
+
+def test_find_matching_topic_case_insensitive_no_match():
+    topic = "Classes"
+    exisitng_topics = {"Recursion", "Binary Trees"}
+
+    result = history.find_matching_topic_case_insensitive(topic, exisitng_topics)
+    assert result is None
+
+
+
 
 
     

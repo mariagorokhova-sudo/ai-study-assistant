@@ -15,7 +15,7 @@ def list_history_entries(data):
 def get_history_by_topic(data, topic):
     filtered_history = []
     for entry in data["history"]:
-        if entry["topic"] == topic:
+        if entry["topic"].lower() == topic.lower():
             filtered_history.append(entry)
 
     return filtered_history
@@ -25,10 +25,11 @@ def count_history_by_topics(data):
 
     for entry in data["history"]:
         topic = entry["topic"]
-        if topic in counts:
-            counts[topic] += 1
-        else:
+        matching_topic = find_matching_topic_case_insensitive(topic, counts)
+        if matching_topic is None:
             counts[topic] = 1
+        else:
+            counts[matching_topic] += 1
 
     return counts
 
@@ -38,5 +39,13 @@ def sort_topics_counts_descending(counts):
 def get_unique_history_topics(data):
     unique_topics = set()
     for entry in data['history']:
-        unique_topics.add(entry["topic"])
+        topic = entry["topic"]
+        if find_matching_topic_case_insensitive(topic, unique_topics) is None:
+            unique_topics.add(topic)
     return unique_topics
+
+def find_matching_topic_case_insensitive(topic, existing_topics):
+    for existing_topic in existing_topics:
+        if topic.lower() == existing_topic.lower():
+            return existing_topic
+    
