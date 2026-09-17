@@ -13,10 +13,10 @@ def test_ai_api_error():
                     with patch("main.topics.list_topics") as mock_list_topics:
                         mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
                         mock_input.side_effect = [
-                            "4",
+                            "2",
                             "1",
                             "what is recursion?",
-                            "6"
+                            "4"
                         ]
 
                         request = httpx.Request("POST", "https://api.openai.com/v1/responses")
@@ -36,10 +36,10 @@ def test_ai_request_success_add_to_history():
                         mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
                         
                         mock_input.side_effect = [
-                                        "4",
+                                        "2",
                                         "2",
                                         "what is inheritance?",
-                                        "6"
+                                        "4"
                                     ]
                         
                         mock_get_history.return_value = [
@@ -73,7 +73,7 @@ def test_view_history():
                         "answer": "Inheritance allows a class to inherit from another class."
                     }
                 ]
-                mock_input.side_effect = ["5", "1", "6"]
+                mock_input.side_effect = ["3", "1", "4"]
 
                 main.main()
 
@@ -86,7 +86,7 @@ def test_view_empty_history():
         with patch("main.history.list_history_entries") as mock_list_history:
             with patch("builtins.print") as mock_print:
                 mock_list_history.return_value = []
-                mock_input.side_effect = ["5", "1", "6"]
+                mock_input.side_effect = ["3", "1", "4"]
 
                 main.main()
 
@@ -94,7 +94,7 @@ def test_view_empty_history():
 
 def test_view_filtered_history():
     with patch("main.history.get_history_by_topic") as mock_history_by_topic:
-        with patch("builtins.input", side_effect = ["5", "2", "classes", "6"]):
+        with patch("builtins.input", side_effect = ["3", "2", "classes", "4"]):
             with patch("builtins.print") as mock_print:
                 mock_history_by_topic.return_value = [
                     {
@@ -113,13 +113,13 @@ def test_view_filtered_history():
                 mock_print.assert_any_call("Answer: Inheritance allows a class to inherit from another class.")
 
 def test_view_history_invalid_input():
-    with patch("builtins.input", side_effect = ["5", "7", "6"]):
+    with patch("builtins.input", side_effect = ["3", "7", "4"]):
         with patch("builtins.print") as mock_print:
             main.main()
             mock_print.assert_any_call("Invalid option!")
 
 def test_view_history_counts_by_topic_sorted():
-    with patch("builtins.input", side_effect = ["5", "3", "6"]):
+    with patch("builtins.input", side_effect = ["3", "3", "4"]):
         with patch("main.history.count_history_by_topics") as mock_count:
             with patch("main.history.sort_topics_counts_descending") as mock_sorted:
                 with patch("builtins.print") as mock_print:
@@ -135,7 +135,7 @@ def test_view_history_counts_by_topic_sorted():
                     mock_print.assert_any_call("classes: 1")
 
 def test_invalid_topic_input():
-    with patch("builtins.input", side_effect = ["4", "abc", "6"]):
+    with patch("builtins.input", side_effect = ["2", "abc", "4"]):
         with patch("main.ai.ask_about_topic") as mock_ask:
             with patch("main.topics.list_topics") as mock_list_topics:
                 with patch("builtins.print") as mock_print:
@@ -154,11 +154,11 @@ def test_other_topic_option():
                     with patch("main.history.add_history_entry") as mock_history:
                         mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
                         mock_input.side_effect = [
-                            "4",
+                            "2",
                             "4",
                             "binary trees",
                             "what is a binary tree?",
-                            "6"
+                            "4"
                         ]
                         mock_history_by_topic.return_value = []
 
@@ -173,7 +173,7 @@ def test_other_topic_option():
 
 @pytest.mark.parametrize("edge_choice", ["0", "99"])
 def test_invalid_topic_input_edge_cases(edge_choice):
-    with patch("builtins.input", side_effect = ["4", edge_choice, "6"]):
+    with patch("builtins.input", side_effect = ["2", edge_choice, "4"]):
         with patch("main.ai.ask_about_topic") as mock_ask:
             with patch("main.topics.list_topics") as mock_list_topics:
                 with patch("builtins.print") as mock_print:
@@ -185,6 +185,44 @@ def test_invalid_topic_input_edge_cases(edge_choice):
                         mock_print.assert_any_call("Invalid option!")
                         mock_ask.assert_not_called()
                         mock_history.assert_not_called()
+
+def test_manage_topics_add_to_main_menu():
+    with patch("builtins.input", side_effect = ["1", "5", "4"]):
+        with patch("builtins.print") as mock_print:
+
+            main.main()
+
+            mock_print.assert_any_call("4. Change topic status")
+
+def test_main_change_topic_status():
+    with patch("builtins.input", side_effect = ["1", "4", "recursion", "in progress", "5", "4"]):
+        with patch("main.topics.change_topic_status") as mock_change_status:
+            with patch("builtins.print") as mock_print:
+                mock_change_status.return_value = (True, "changed")
+
+                main.main()
+
+                mock_change_status.assert_called_once_with(main.data, "recursion", "in progress")
+                mock_print.assert_any_call("Status changed!")
+
+@pytest.mark.parametrize(
+    "change_status, reason, expected_message", 
+    [(False, "invalid status", "Invalid status!"), 
+    (False, "topic not found", "Topic not found!")])
+def test_main_change_topic_status_unsuccessful(change_status, reason, expected_message):
+    with patch("builtins.input", side_effect = ["1", "4", "recursion", "in progress", "5", "4"]):
+        with patch("main.topics.change_topic_status") as mock_change_status:
+            with patch("builtins.print") as mock_print:
+                mock_change_status.return_value = (change_status, reason)
+
+                main.main()
+
+                mock_change_status.assert_called_once_with(main.data, "recursion", "in progress")
+                mock_print.assert_any_call(expected_message)
+
+
+
+
 
             
 

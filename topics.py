@@ -42,3 +42,14 @@ def get_topics_not_discussed_with_ai(data):
     all_topics = set(list_topics(data))
     asked_topics = history.get_unique_history_topics(data)
     return all_topics - asked_topics
+
+def change_topic_status(data, topic_name, new_status):
+    valid_statuses = {"new", "in progress", "exam prep", "finished"}
+    if new_status not in valid_statuses:
+        return False, "invalid status"
+    for entry in data["topics"]:
+        if entry["name"].lower() == topic_name.lower():
+            entry["status"] = new_status
+            storage.save_topics(data)
+            return True, "changed"
+    return False, "topic not found"

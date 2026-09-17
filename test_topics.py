@@ -1,5 +1,6 @@
 import topics
 from unittest.mock import patch
+import pytest
 
 def test_add_topic():
     data = {"topics": []}
@@ -229,6 +230,71 @@ def test_get_topics_not_discussed_with_ai():
     topics_not_discussed_with_ai = topics.get_topics_not_discussed_with_ai(data)
 
     assert topics_not_discussed_with_ai == {"algorithms"}
+
+def test_change_topic_status():
+    with patch("topics.storage.save_topics") as mock_save:
+        data = {
+            "topics": [
+                {
+                    "name": "recursion",
+                    "status": "new",
+                    "notes": ""
+                }
+            ]
+        }
+
+        topic_name = "Recursion"
+        new_status = "in progress"
+
+        topics.change_topic_status(data, topic_name, new_status)
+
+        assert data["topics"] == [
+            {
+                "name": "recursion",
+                "status": "in progress",
+                "notes": ""
+            }
+        ]
+       
+        mock_save.assert_called_once_with(data)
+
+@pytest.mark.parametrize(
+    "topic_name, new_status, reason", 
+    [("recursion", "banana", "invalid status"), 
+    ("graphs", "in progress", "topic not found")])
+def test_change_topic_status_invalid_status(topic_name, new_status, reason):
+    with patch("topics.storage.save_topics") as mock_save:
+        data = {
+            "topics": [
+                {
+                    "name": "recursion",
+                    "status": "new",
+                    "notes": ""
+                }
+            ]
+        }
+
+        result, actual_reason = topics.change_topic_status(data, topic_name, new_status)
+
+        assert result == False
+        assert actual_reason == reason
+        assert data["topics"] == [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ""
+            }
+        ]
+        mock_save.assert_not_called()
+
+
+
+           
+
+
+
+
+
 
 
 
