@@ -21,17 +21,25 @@ def main():
                 print("2. Add topic")
                 print("3. Delete topic")
                 print("4. Change topic status")
-                print("5. Back")
+                print("5. Add new note")
+                print("6. Back")
 
                 manage_choice = input("Please choose an option: ").strip()
 
                 if manage_choice == "1":
-                    topic_names = topics.list_topics(data)
-                    if not topic_names:
+                    if not data["topics"]:
                         print("No topics yet!")
                     else:
-                        for name in topic_names:
-                            print(name)
+                        for number, topic_details in enumerate(data["topics"], start=1):
+                            print(f'{number}. {topic_details["name"]}')
+                            print(f'Status: {topic_details["status"]}')
+                            if not topic_details["notes"]:
+                                print("Notes: no notes yet!")
+                            else:
+                                print(f'Notes:')
+                                for note in topic_details["notes"]:
+                                    print(f'- {note}')
+
 
                 elif manage_choice == "2":
                     name = input("Please enter a topic name: ")
@@ -67,8 +75,35 @@ def main():
                     elif reason == "topic not found":
                         print("Topic not found!")
 
-
                 elif manage_choice == "5":
+                    topic_names = topics.list_topics(data)
+                    if not topic_names:
+                        print("No topics yet!")
+                        continue
+                    for i in range (1, len(topic_names)+1):
+                        print(f"{i}. {topic_names[i-1]}.")
+                    
+                    try:
+                        topic_choice = int(input("Please enter a topic number: "))
+                    except ValueError:
+                        print("Invalid option!")
+                        continue
+                    
+                    if topic_choice > len(topic_names) or topic_choice < 1:
+                        print("Invalid option!")
+                        continue
+                    else:
+                        topic = topic_names[topic_choice - 1]
+
+                    new_note = input("Please enter your note: ")
+
+                    added, reason = topics.add_note(data, topic, new_note)
+                    if added:
+                        print("Note added!")
+                    elif reason == "empty note":
+                        print("It's not possible to add an empty note!")
+
+                elif manage_choice == "6":
                     break
 
                 else:

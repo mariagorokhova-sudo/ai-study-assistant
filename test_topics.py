@@ -262,7 +262,7 @@ def test_change_topic_status():
     "topic_name, new_status, reason", 
     [("recursion", "banana", "invalid status"), 
     ("graphs", "in progress", "topic not found")])
-def test_change_topic_status_invalid_status(topic_name, new_status, reason):
+def test_change_topic_status_invalid_input(topic_name, new_status, reason):
     with patch("topics.storage.save_topics") as mock_save:
         data = {
             "topics": [
@@ -286,6 +286,65 @@ def test_change_topic_status_invalid_status(topic_name, new_status, reason):
             }
         ]
         mock_save.assert_not_called()
+
+def test_add_note_to_existing_notes():
+    with patch("topics.storage.save_topics") as mock_save:
+        data = {
+                "topics": [
+                    {
+                        "name": "recursion",
+                        "status": "new",
+                        "notes": ["Base case stops recursion"]
+                    }
+                ]
+            }
+        topic_name = "recursion"
+        new_note = "Recursive case calls the function again"
+
+        result, reason = topics.add_note(data, topic_name, new_note)
+
+        assert result == True
+        assert reason == "added"
+        assert data["topics"] == [
+                    {
+                        "name": "recursion",
+                        "status": "new",
+                        "notes": ["Base case stops recursion",
+                                "Recursive case calls the function again"]
+                    }
+                ]
+        mock_save.assert_called_once_with(data)
+
+@pytest.mark.parametrize("topic_name, new_note, reason", 
+                        [("functions", "note about function", "topic not found"),
+                        ("recursion", "", "empty note"),
+                        (("recursion", "  ", "empty note"))])
+def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
+    with patch("topics.storage.save_topics") as mock_save:
+        data = {
+            "topics": [
+                {
+                    "name": "recursion",
+                    "status": "new",
+                    "notes": ["Base case stops recursion"]
+                }
+            ]
+        }
+        result, actual_reason = topics.add_note(data, topic_name, new_note)
+
+        assert result == False
+        assert actual_reason == reason
+        assert data["topics"] == [
+            {
+                "name": "recursion",
+                "status": "new",
+                "notes": ["Base case stops recursion"]
+            }
+        ]
+        mock_save.assert_not_called()
+
+
+
 
 
 

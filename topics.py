@@ -53,3 +53,13 @@ def change_topic_status(data, topic_name, new_status):
             storage.save_topics(data)
             return True, "changed"
     return False, "topic not found"
+
+def add_note(data, topic_name, new_note):
+    if not new_note.strip():
+        return False, "empty note"
+    for entry in data["topics"]:
+        if topic_name.lower() == entry["name"].lower():
+            entry["notes"].append(new_note)
+            storage.save_topics(data)
+            return True, "added"
+    return False, "topic not found"
