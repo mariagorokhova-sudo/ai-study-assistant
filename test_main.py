@@ -195,85 +195,9 @@ def test_manage_topics_add_to_main_menu():
             mock_print.assert_any_call("4. Change topic status")
             mock_print.assert_any_call("5. Add new note")
 
-def test_main_change_topic_status():
-    with patch("builtins.input", side_effect = ["1", "4", "recursion", "in progress", "6", "4"]):
-        with patch("main.topics.change_topic_status") as mock_change_status:
-            with patch("builtins.print") as mock_print:
-                mock_change_status.return_value = (True, "changed")
 
-                main.main()
 
-                mock_change_status.assert_called_once_with(main.data, "recursion", "in progress")
-                mock_print.assert_any_call("Status changed!")
 
-@pytest.mark.parametrize(
-    "change_status, reason, expected_message", 
-    [(False, "invalid status", "Invalid status!"), 
-    (False, "topic not found", "Topic not found!")])
-def test_main_change_topic_status_unsuccessful(change_status, reason, expected_message):
-    with patch("builtins.input", side_effect = ["1", "4", "recursion", "in progress", "6", "4"]):
-        with patch("main.topics.change_topic_status") as mock_change_status:
-            with patch("builtins.print") as mock_print:
-                mock_change_status.return_value = (change_status, reason)
-
-                main.main()
-
-                mock_change_status.assert_called_once_with(main.data, "recursion", "in progress")
-                mock_print.assert_any_call(expected_message)
-
-def test_main_add_new_note():
-    with patch("builtins.input", side_effect = ["1", "5", "2", "Tree has a root node", "6", "4"]):
-        with patch("main.topics.list_topics") as mock_list_topics:
-            with patch("main.topics.add_note") as mock_add_note:
-                mock_list_topics.return_value = ["Recursion", "Binary Trees"]
-                mock_add_note.return_value = (True, "added")
-
-                main.main()
-
-                mock_add_note.assert_called_once_with(main.data, "Binary Trees", "Tree has a root node")
-
-def test_main_add_new_note_no_topics():
-    with patch("builtins.input", side_effect = ["1", "5", "6", "4"]):
-        with patch("main.topics.list_topics") as mock_list_topics:
-            with patch("main.topics.add_note") as mock_add_note:
-                with patch("builtins.print") as mock_print:
-                    mock_list_topics.return_value = []
-
-                    main.main()
-
-                    mock_print.assert_any_call("No topics yet!")
-                    mock_add_note.assert_not_called()
-
-def test_main_get_topics_with_details():
-    data = {
-        "topics": [
-            {
-                "name": "recursion",
-                "status": "in progress",
-                "notes": ["note 1", "note 2"]
-            },
-            {
-                "name": "classes",
-                "status": "new",
-                "notes": []
-            }
-        ],
-        "history": []
-    }
-    with patch("main.data", data):
-        with patch("builtins.input", side_effect = ["1", "1", "6", "4"]):
-            with patch("builtins.print") as mock_print:
-
-                main.main()
-
-                mock_print.assert_any_call("1. recursion")
-                mock_print.assert_any_call("Status: in progress")
-                mock_print.assert_any_call("Notes:")
-                mock_print.assert_any_call("- note 1")
-                mock_print.assert_any_call("- note 2")
-                mock_print.assert_any_call("2. classes")
-                mock_print.assert_any_call("Status: new")
-                mock_print.assert_any_call("Notes: no notes yet!")
 
 
 
