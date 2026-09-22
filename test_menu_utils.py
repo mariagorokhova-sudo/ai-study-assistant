@@ -63,3 +63,34 @@ def test_print_numbered_topics_with_details():
         mock_print.assert_any_call("2. classes")
         mock_print.assert_any_call("Status: new")
         mock_print.assert_any_call("Notes: no notes yet!\n")
+
+def test_print_history_entries_empty_list():
+    entries_list = []
+    with patch("builtins.print") as mock_print:
+        
+        menu_utils.print_history_entries(entries_list)
+
+        mock_print.assert_any_call("No history on this topic yet!\n")
+
+def test_print_history_entries():
+    entries_list = [
+        {
+            "topic": "classes",
+            "question": "what is inheritance?",
+            "answer": "Inheritance allows a class to inherit from another class."
+        },
+        {
+            "topic": "recursion",
+            "question": "what is a base case?",
+            "answer": "A **base case** tells a recursive function when to stop calling itself."
+        }
+    ]
+    with patch("builtins.print") as mock_print:
+        menu_utils.print_history_entries(entries_list)
+
+        mock_print.assert_any_call("\nTopic: classes")
+        mock_print.assert_any_call("Question: what is inheritance?")
+        mock_print.assert_any_call("Answer: Inheritance allows a class to inherit from another class.")
+        mock_print.assert_any_call("\nTopic: recursion")
+        mock_print.assert_any_call("Question: what is a base case?")
+        mock_print.assert_any_call("Answer: A **base case** tells a recursive function when to stop calling itself.")

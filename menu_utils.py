@@ -32,3 +32,13 @@ def print_numbered_topics_with_details(data):
                 print(f'- {note}')
             print("\n")
 
+def print_history_entries(entries_list):
+    if not entries_list:
+        print("No history on this topic yet!\n")
+    else:
+        for entry in entries_list:
+            print(f"\nTopic: {entry['topic']}")
+            print(f"Question: {entry['question']}")
+            print(f"Answer: {entry['answer']}")
+
+
