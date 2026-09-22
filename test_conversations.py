@@ -1,0 +1,95 @@
+import conversations
+
+def test_create_conversation():
+    data = {"topics": [], "history": [], "conversations": []}
+    topic = "recursion"
+    ai_mode = "socratic tutor"
+
+    result = conversations.create_conversation(data, topic, ai_mode)
+
+    assert data == {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": []
+            }
+        ]
+    }
+
+    assert result == {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": []
+            }
+
+def test_add_message_to_existing_conversation():
+    data = {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": []
+            }
+        ]
+    }
+    role = "user"
+    content = "What is recursion?"
+
+    conversations.add_message_to_conversation(data["conversations"][0], role, content)
+
+    assert data == {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"}]
+            }
+        ]
+    }
+
+def test_add_second_message_to_conversation():
+    data = {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"}]
+            }
+        ]
+    }
+
+    role = "assistant"
+    content = "**Recursion** is when a function calls itself to solve a smaller version of the same problem."
+
+    conversations.add_message_to_conversation(data["conversations"][0], role, content)
+
+    assert data == {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+
+

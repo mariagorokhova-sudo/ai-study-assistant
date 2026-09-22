@@ -8,11 +8,12 @@ def load_topics():
         with DATA_FILE.open("r") as file:
             data = json.load(file)
             data.setdefault("history", [])
+            data.setdefault("conversations", [])
             for entry in data["topics"]:
                 if entry["notes"] == "":
                     entry["notes"] = []
             return data
-    return {"topics":[], "history": []}
+    return {"topics":[], "history": [], "conversations": []}
 
 def save_topics(data):
     with DATA_FILE.open("w") as file:
