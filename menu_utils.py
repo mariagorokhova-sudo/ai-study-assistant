@@ -3,6 +3,12 @@ def print_numbered_topics(topic_names_list):
         print(f"{number}. {topic_name}")
     print("\n")
 
+def print_numbered_topics_with_other_option(topic_names_list):
+    for number, topic_name in enumerate(topic_names_list, start=1):
+        print(f"{number}. {topic_name}")
+    last_option = len(topic_names_list)+1
+    print(f"{last_option}. Other\n")
+
 def choose_topic_from_enumerated_list(topic_names_list):
     if not topic_names_list:
         print("No topics yet!\n")
@@ -16,6 +22,29 @@ def choose_topic_from_enumerated_list(topic_names_list):
     if topic_choice > len(topic_names_list) or topic_choice < 1:
         print("Invalid option!\n")
         return
+    else:
+        return topic_names_list[topic_choice - 1]
+
+def choose_topic_from_enumerated_list_with_other_option(topic_names_list):
+    if not topic_names_list:
+        print("No topics yet!\n")
+        return
+    last_option = len(topic_names_list)+1
+    try:
+        topic_choice = int(input("Please enter a topic number: "))
+    except ValueError:
+        print("Invalid option!\n")
+        return
+  
+    if topic_choice > last_option or topic_choice < 1:
+        print("Invalid option!\n")
+        return
+    elif topic_choice == last_option:
+        topic_name = input("Please enter a topic name: ")
+        if not topic_name:
+            print("Topic name cannot be empty!\n")
+            return
+        return topic_name
     else:
         return topic_names_list[topic_choice - 1]
 

@@ -1,3 +1,138 @@
-import ai_menu
 import ai
+import ai_menu
+import history
+import storage
+import openai
+import httpx
+from unittest.mock import patch, call
+import pytest
+
+def test_ai_api_error():
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("builtins.input") as mock_input:
+        with patch("ai_menu.topics.list_topics") as mock_list_topics:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.create_conversation") as mock_conversation:                     
+                        with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
+                            with patch("builtins.print") as mock_print:
+                                with patch("ai_menu.storage.save_topics") as mock_save:
+                                    mock_input.side_effect = [
+                                        "1",
+                                        "1",
+                                        "what is recursion?",
+                                    ]
+                                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                                    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                                    mock_ask.side_effect = openai.APIConnectionError(request=request)
+                                    mock_conversation.return_value = {"topic": "recursion", "ai_mode": "Tutor", "messages": []}
+
+                                    ai_menu.manage_ai_menu(data)
+
+                                    mock_print.assert_any_call("Sorry, the AI request failed. Please try again.")
+                                    mock_message.assert_called_once_with(mock_conversation.return_value, "user", "what is recursion?")
+                                    mock_save.assert_called_once_with(data)
+
+def test_ai_request_success_add_messages_to_conversation():
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("builtins.input") as mock_input:
+        with patch("ai_menu.topics.list_topics") as mock_list_topics:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                with patch("ai_menu.conversations.create_conversation") as mock_conversation:
+                    with patch("ai_menu.history.get_history_by_topic") as mock_get_history:
+                        with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
+                            with patch("ai_menu.storage.save_topics") as mock_save:
+                                mock_input.side_effect = [
+                                                "2",
+                                                "2",
+                                                "what is inheritance?",
+                                            ]
+                                mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                                mock_conversation.return_value = {"topic": "classes", "ai_mode": "Socratic tutor", "messages": []}
+                                mock_get_history.return_value = [
+                                    {
+                                        "topic": "classes",
+                                        "question": "what is a class?",
+                                        "answer": "A class is ..."
+                                    }
+                                ]
+                                mock_ask.return_value = "Inheritance allows a class to inherit from another class."
+
+                                ai_menu.manage_ai_menu(data)
+
+                                mock_get_history.assert_called_once_with(data, "classes")
+                                mock_ask.assert_called_once_with("classes", "what is inheritance?", mock_get_history.return_value)
+                                assert mock_message.call_count == 2
+                                mock_message.assert_has_calls([
+                                    call(mock_conversation.return_value, "user", "what is inheritance?"),
+                                    call(mock_conversation.return_value, "assistant", "Inheritance allows a class to inherit from another class.")
+                                    ])
+                                mock_save.assert_called_once_with(data)
+
+def test_invalid_topic_input():
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("builtins.input", side_effect = ["abc"]):
+        with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+            with patch("ai_menu.topics.list_topics") as mock_list_topics:
+                with patch("builtins.print") as mock_print:
+                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+
+                    ai_menu.manage_ai_menu(data)
+
+                    mock_print.assert_any_call("Invalid option!\n")
+                    mock_ask.assert_not_called()
+
+def test_other_topic_option():
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("ai_menu.topics.list_topics") as mock_list_topics:
+        with patch("builtins.input") as mock_input:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                with patch("ai_menu.history.get_history_by_topic") as mock_history_by_topic:
+                    with patch("ai_menu.storage.save_topics") as mock_save:
+                        mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                        mock_input.side_effect = [
+                            "4",
+                            "binary trees",
+                            "1",
+                            "what is a binary tree?",
+                        ]
+                        mock_history_by_topic.return_value = []
+
+                        mock_ask.return_value == "A binary tree is a ..."
+
+                        ai_menu.manage_ai_menu(data)
+
+                        mock_ask.assert_called_once_with(
+                            "binary trees",
+                            "what is a binary tree?", 
+                            mock_history_by_topic.return_value)
+
+@pytest.mark.parametrize("edge_choice", ["0", "99"])
+def test_invalid_topic_input_edge_cases(edge_choice):
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("builtins.input", side_effect = [edge_choice]):
+        with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+            with patch("ai_menu.topics.list_topics") as mock_list_topics:
+                with patch("builtins.print") as mock_print:
+                    with patch("ai_menu.storage.save_topics") as mock_save:
+                        mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+
+                        ai_menu.manage_ai_menu(data)
+
+                        mock_print.assert_any_call("Invalid option!\n")
+                        mock_ask.assert_not_called()
+                        mock_save.assert_not_called()
+
+def test_ai_menu_create_conversation_success():
+    data = {"topics": [], "history": [], "conversations": []}
+    with patch("ai_menu.topics.list_topics") as mock_list_topics:
+        with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+            with patch("builtins.input", side_effect = ["2", "2", "what is inheritance?"]):
+                with patch("ai_menu.conversations.create_conversation") as mock_conversation:
+                    with patch("ai_menu.history.add_history_entry") as mock_history:
+                        mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+
+                        ai_menu.manage_ai_menu(data)
+
+                        mock_conversation.assert_called_once_with(data, "classes", "Socratic tutor")
 
