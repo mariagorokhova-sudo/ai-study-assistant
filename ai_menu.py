@@ -1,7 +1,6 @@
 import ai
 import openai
 import topics
-import history
 import storage
 import menu_utils
 import conversations
@@ -19,18 +18,23 @@ def manage_ai_menu(data):
     if not ai_mode:
         return
 
-    conversation_entry = conversations.create_conversation(data, topic_name, ai_mode)
+    conversation_entry = None
 
-    question = input("Please enter your question: ")
-    conversations.add_message_to_conversation(conversation_entry, "user", question)
-    
+    while True:
+        question = input("Please enter your question or /exit: ")
+        if question == "/exit":
+            break
+        
+        if conversation_entry is None:
+            conversation_entry = conversations.create_conversation(data, topic_name, ai_mode)
 
-    previous_history = history.get_history_by_topic(data, topic_name)
-    try:
-        answer = ai.ask_about_topic(topic_name, question, previous_history)
-        print(f"\n{answer}")
-        conversations.add_message_to_conversation(conversation_entry, "assistant", answer)
-    except openai.APIError:
-        print("Sorry, the AI request failed. Please try again.")
-    storage.save_topics(data)
+        conversations.add_message_to_conversation(conversation_entry, "user", question)
+        
+        try:
+            answer = ai.ask_about_topic(conversation_entry)
+            print(f"\n{answer}")
+            conversations.add_message_to_conversation(conversation_entry, "assistant", answer)
+        except openai.APIError:
+            print("Sorry, the AI request failed. Please try again.")
+        storage.save_topics(data)
     
