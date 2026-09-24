@@ -40,7 +40,7 @@ def manage_topics_menu(data):
                 print("Topic already exists!\n")
 
         elif manage_choice == "3":
-            topic_name = menu_utils.choose_topic_from_enumerated_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue
             print(f"\nYou've chosen: {topic_name}")
@@ -52,7 +52,7 @@ def manage_topics_menu(data):
                 menu_utils.print_numbered_list(topics.list_topics(data))
 
         elif manage_choice == "4":
-            topic_name = menu_utils.choose_topic_from_enumerated_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue
             print(f"You've chosen: {topic_name}")
@@ -66,7 +66,7 @@ def manage_topics_menu(data):
                 print("Invalid status!\n")
 
         elif manage_choice == "5":
-            topic_name = menu_utils.choose_topic_from_enumerated_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue
             print(f"You've chosen: {topic_name}")

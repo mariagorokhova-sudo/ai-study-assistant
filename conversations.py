@@ -17,4 +17,11 @@ def get_last_user_message(conversation_entry):
     for message in reversed(conversation_entry["messages"]):
         if message["role"] == "user":
             return message["content"]
+
+def get_unique_conversations_topics(data):
+    conversation_topics_list = []
+    for conversation_entry in data["conversations"]:
+        if conversation_entry["topic"] not in conversation_topics_list:
+            conversation_topics_list.append(conversation_entry["topic"])
+    return conversation_topics_list
     

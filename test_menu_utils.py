@@ -11,30 +11,30 @@ def test_print_numbered_list():
         mock_print.assert_any_call("1. Recursion")
         mock_print.assert_any_call("2. Classes")
 
-def test_choose_topic_from_enumerated_list():
+def test_choose_from_numbered_list():
     topic_names_list = ["Recursion", "Classes"]
     with patch("builtins.input", side_effect=["2"]):
-        result = menu_utils.choose_topic_from_enumerated_list(topic_names_list)
+        result = menu_utils.choose_from_numbered_list(topic_names_list)
 
         assert result == "Classes"
 
 
 @pytest.mark.parametrize("wrong_input", ["abc", "99", "0"])
-def test_choose_topic_from_enumerated_list_wrong_input(wrong_input):
+def test_choose_from_numbered_list_wrong_input(wrong_input):
     topic_names_list = ["Recursion", "Classes"]
     with patch("builtins.input", side_effect=wrong_input):
         with patch("builtins.print") as mock_print:
-            menu_utils.choose_topic_from_enumerated_list(topic_names_list)
+            menu_utils.choose_from_numbered_list(topic_names_list)
 
             mock_print.assert_any_call("Invalid option!\n")
 
-def test_choose_topic_from_enumerated_list_empty_list():
+def test_choose_from_numbered_list_empty_list():
     topic_names_list = []
     with patch("builtins.print") as mock_print:
-        result = menu_utils.choose_topic_from_enumerated_list(topic_names_list)
+        result = menu_utils.choose_from_numbered_list(topic_names_list)
 
         assert result is None
-        mock_print.assert_any_call("No topics yet!\n")
+        mock_print.assert_any_call("No options yet!\n")
 
 def test_print_numbered_topics_with_details():
     data = {
@@ -64,37 +64,6 @@ def test_print_numbered_topics_with_details():
         mock_print.assert_any_call("Status: new")
         mock_print.assert_any_call("Notes: no notes yet!\n")
 
-def test_print_history_entries_empty_list():
-    entries_list = []
-    with patch("builtins.print") as mock_print:
-        
-        menu_utils.print_history_entries(entries_list)
-
-        mock_print.assert_any_call("No history on this topic yet!\n")
-
-def test_print_history_entries():
-    entries_list = [
-        {
-            "topic": "classes",
-            "question": "what is inheritance?",
-            "answer": "Inheritance allows a class to inherit from another class."
-        },
-        {
-            "topic": "recursion",
-            "question": "what is a base case?",
-            "answer": "A **base case** tells a recursive function when to stop calling itself."
-        }
-    ]
-    with patch("builtins.print") as mock_print:
-        menu_utils.print_history_entries(entries_list)
-
-        mock_print.assert_any_call("\nTopic: classes")
-        mock_print.assert_any_call("Question: what is inheritance?")
-        mock_print.assert_any_call("Answer: Inheritance allows a class to inherit from another class.")
-        mock_print.assert_any_call("\nTopic: recursion")
-        mock_print.assert_any_call("Question: what is a base case?")
-        mock_print.assert_any_call("Answer: A **base case** tells a recursive function when to stop calling itself.")
-
 def test_print_numbered_conversations():
     conversations_list = [{
         "topic": "recursion", 
@@ -111,6 +80,85 @@ def test_print_numbered_conversations():
 
         mock_print.assert_any_call("1. AI mode: Socratic tutor | Last question: What is recursion?")
         mock_print.assert_any_call("2. Start new conversation\n")
+
+def test_print_numbered_conversations_empty_list():
+    conversations_list = []
+    with patch("builtins.print") as mock_print:
+        menu_utils.print_numbered_conversations(conversations_list)
+
+        mock_print.assert_any_call("No conversations yet!\n")
+
+def test_print_all_conversation_messages():
+    conversation_entry = {
+        "topic": "recursion",
+        "ai_mode": "Socratic tutor",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is recursion?"
+            },
+            {
+                "role": "assistant",
+                "content": "It's when a function calls itself."
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+
+        menu_utils.print_all_conversation_messages(conversation_entry)
+
+        mock_print.assert_any_call("AI mode: Socratic tutor\n")
+        mock_print.assert_any_call("User: What is recursion?\n")
+        mock_print.assert_any_call("Assistant: It's when a function calls itself.\n")
+
+def test_print_all_conversation_messages():
+    conversation_entry = {
+        "topic": "recursion",
+        "ai_mode": "Socratic tutor",
+        "messages": [
+            {
+                "role": "user",
+                "content": "What is recursion?"
+            },
+            {
+                "role": "assistant",
+                "content": "It's when a function calls itself."
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+
+        menu_utils.print_all_conversation_messages(conversation_entry)
+
+        mock_print.assert_any_call("AI mode: Socratic tutor\n")
+        mock_print.assert_any_call("User: What is recursion?\n")
+        mock_print.assert_any_call("Assistant: It's when a function calls itself.\n")
+
+def test_choose_from_numbered_list_without_other_option():
+    options_list = [
+        {
+            "topic": "recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "What is recursion?"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It's when a function calls itself."
+                }
+            ]
+        }
+    ]
+
+    with patch("builtins.input", side_effect=["1"]):
+       result = menu_utils.choose_from_numbered_list(options_list, include_other_option=False)
+
+       assert result == options_list[0]
+    
+
+
 
 
 

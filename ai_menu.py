@@ -7,8 +7,8 @@ import conversations
 
 def manage_ai_menu(data):
     topics_list = topics.list_topics(data)
-    menu_utils.print_numbered_list_with_last_option(topics_list)
-    topic_name = menu_utils.choose_from_enumerated_list_with_last_option(topics_list)
+    menu_utils.print_numbered_list(topics_list, include_other_option=True)
+    topic_name = menu_utils.choose_from_numbered_list(topics_list, include_other_option=True)
     if topic_name is None:
         return
     if topic_name == "new":
@@ -19,7 +19,7 @@ def manage_ai_menu(data):
 
     conversations_list = conversations.get_conversations_by_topic(data, topic_name)
     menu_utils.print_numbered_conversations(conversations_list)
-    conversation_entry = menu_utils.choose_from_enumerated_list_with_last_option(conversations_list)
+    conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=True)
 
     if conversation_entry is None:
         return
@@ -28,7 +28,7 @@ def manage_ai_menu(data):
         ai_modes_list = ["Tutor", "Socratic tutor", "Debugger", "Code reviewer", "Examiner"]
         print("\nPlease choose AI mode:")
         menu_utils.print_numbered_list(ai_modes_list)
-        ai_mode = menu_utils.choose_topic_from_enumerated_list(ai_modes_list)
+        ai_mode = menu_utils.choose_from_numbered_list(ai_modes_list)
         if not ai_mode:
             return
 
