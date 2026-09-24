@@ -19,6 +19,7 @@ def test_ai_api_error():
                                     mock_input.side_effect = [
                                         "1",
                                         "1",
+                                        "1",
                                         "what is recursion?",
                                         "/exit"
                                     ]
@@ -43,6 +44,7 @@ def test_ai_request_success_add_messages_to_conversation():
                         with patch("ai_menu.storage.save_topics") as mock_save:
                             mock_input.side_effect = [
                                             "2",
+                                            "1",
                                             "2",
                                             "what is inheritance?",
                                             "/exit"
@@ -85,6 +87,7 @@ def test_other_topic_option():
                         "4",
                         "binary trees",
                         "1",
+                        "1",
                         "what is a binary tree?",
                         "/exit"
                     ]
@@ -116,7 +119,7 @@ def test_ai_menu_create_conversation_success():
     data = {"topics": [], "history": [], "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
-            with patch("builtins.input", side_effect = ["2", "2", "what is inheritance?", "/exit"]):
+            with patch("builtins.input", side_effect = ["2", "1", "2", "what is inheritance?", "/exit"]):
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
                     with patch("ai_menu.storage.save_topics") as mock_save:
                         mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
@@ -143,7 +146,7 @@ def test_ai_menu_exit_from_ai_conversation():
 def test_ai_menu_continuing_conversation():
     data = {"topics": [], "history": [], "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
-        with patch("builtins.input", side_effect = ["2", "2", "What is inheritance?", "Can you give me an example?", "/exit"]):
+        with patch("builtins.input", side_effect = ["2", "1", "2", "What is inheritance?", "Can you give me an example?", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
                     with patch("ai_menu.storage.save_topics") as mock_save:
@@ -164,6 +167,45 @@ def test_ai_menu_continuing_conversation():
                                                            call(mock_conversation.return_value, "assistant", "For example, Dog can inherit from Animal")])
                             mock_conversation.assert_called_once_with(data, "classes", "Socratic tutor")
                             assert mock_save.call_count == 2
+
+def test_choose_existing_conversation_to_continue():
+    existing_conversation = {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is base case?"},
+                {"role": "assistant",
+                "content": "Base case is ..."},
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+        }
+    data = {"topics": [], "history": [], "conversations": [existing_conversation]}
+    with patch("ai_menu.topics.list_topics") as mock_list_topics:
+        with patch("builtins.input", side_effect = ["1", "1", "Why do we need a base case?", "/exit"]):
+            with patch("ai_menu.conversations.get_conversations_by_topic") as mock_conversations_list:
+                with patch("ai_menu.conversations.create_conversation") as mock_conversation:
+                    with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                        with patch("ai_menu.storage.save_topics") as mock_save:
+                            mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
+                            mock_conversations_list.return_value = [existing_conversation]
+                            mock_ask.return_value = "Without one the function will call itself forever causing the program to crash."
+
+                            ai_menu.manage_ai_menu(data)
+
+                            mock_conversation.assert_not_called()
+                            mock_ask.assert_called_once_with(existing_conversation)
+                            assert existing_conversation["messages"][-2] == {"role": "user",
+                                                                             "content": "Why do we need a base case?"}
+                            assert existing_conversation["messages"][-1] == {"role": "assistant",
+                                                                             "content": "Without one the function will call itself forever causing the program to crash."}
+                            mock_save.assert_called_once_with(data)
+
+
+
+
 
 
 

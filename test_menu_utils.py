@@ -1,12 +1,12 @@
 import menu_utils
-from unittest.mock import patch
+from unittest.mock import patch, call
 import pytest
 
-def test_print_numbered_topics():
+def test_print_numbered_list():
     topic_names_list = ["Recursion", "Classes"]
     with patch("builtins.print") as mock_print:
 
-        menu_utils.print_numbered_topics(topic_names_list)
+        menu_utils.print_numbered_list(topic_names_list)
 
         mock_print.assert_any_call("1. Recursion")
         mock_print.assert_any_call("2. Classes")
@@ -94,3 +94,24 @@ def test_print_history_entries():
         mock_print.assert_any_call("\nTopic: recursion")
         mock_print.assert_any_call("Question: what is a base case?")
         mock_print.assert_any_call("Answer: A **base case** tells a recursive function when to stop calling itself.")
+
+def test_print_numbered_conversations():
+    conversations_list = [{
+        "topic": "recursion", 
+        "ai_mode": "Socratic tutor", 
+        "messages": [
+            {"role": "user",
+            "content": "What is recursion?"},
+            {"role": "assistant",
+            "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+        }] 
+    with patch("builtins.print") as mock_print:
+        
+        menu_utils.print_numbered_conversations(conversations_list)
+
+        mock_print.assert_any_call("1. AI mode: Socratic tutor | Last question: What is recursion?")
+        mock_print.assert_any_call("2. Start new conversation\n")
+
+
+
+

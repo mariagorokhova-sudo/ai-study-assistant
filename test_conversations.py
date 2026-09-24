@@ -92,4 +92,83 @@ def test_add_second_message_to_conversation():
         ]
     }
 
+def test_get_conversations_by_topic():
+    data = {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            },
+            {
+            "topic": "recursion", 
+            "ai_mode": "Debugger", 
+            "messages": [
+                {"role": "user",
+                "content": "Question on debugging?"},
+                {"role": "assistant",
+                "content": "Answer on debugging"}]
+            },
+            {
+                "topic": "classes", 
+                "ai_mode": "socratic tutor", 
+                "messages": [
+                    {"role": "user",
+                    "content": "What is inheritance"},
+                    {"role": "assistant",
+                    "content": "Inheritance lets one class reuse another class."}]
+            }
+        ]
+    }
+
+    topic_name = "recursion"
+
+    result = conversations.get_conversations_by_topic(data, topic_name)
+
+    assert result == [{
+        "topic": "recursion", 
+        "ai_mode": "socratic tutor", 
+        "messages": [
+            {"role": "user",
+            "content": "What is recursion?"},
+            {"role": "assistant",
+            "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+        },
+        {
+        "topic": "recursion", 
+        "ai_mode": "Debugger", 
+        "messages": [
+            {"role": "user",
+            "content": "Question on debugging?"},
+            {"role": "assistant",
+            "content": "Answer on debugging"}]
+        }]
+
+def test_get_last_user_message():
+    conversation_entry = {
+        "topic": "recursion", 
+        "ai_mode": "socratic tutor", 
+        "messages": [
+            {"role": "user",
+            "content": "What is base case?"},
+            {"role": "assistant",
+            "content": "Base case is ..."},
+            {"role": "user",
+            "content": "What is recursion?"},
+            {"role": "assistant",
+            "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+        }
+
+    last_user_message = conversations.get_last_user_message(conversation_entry)
+
+    assert last_user_message == "What is recursion?"
+
+
+
 

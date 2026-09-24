@@ -34,7 +34,7 @@ def test_delete_topic_option_success():
     }
     with patch("builtins.input", side_effect=["3", "6"]):
         with patch("topics_menu.menu_utils.choose_topic_from_enumerated_list") as mock_choice:
-            with patch("menu_utils.print_numbered_topics") as mock_print_numbered_topics:
+            with patch("menu_utils.print_numbered_list") as mock_print_numbered_topics:
                 with patch("topics_menu.topics.delete_topic") as mock_delete:
                     with patch("builtins.print") as mock_print:
                         mock_choice.return_value = "recursion"

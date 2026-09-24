@@ -130,7 +130,7 @@ def test_history_menu_view_history_on_specific_topic_empty_history():
     data = {"topics":[], "history": []}
     with patch("builtins.input", side_effect = ["2", "4"]):
         with patch("builtins.print") as mock_print:
-            with patch("history_menu.menu_utils.print_numbered_topics") as mock_print_numbererd_topics:
+            with patch("history_menu.menu_utils.print_numbered_list") as mock_print_numbererd_topics:
 
                 history_menu.manage_history_menu(data)
 

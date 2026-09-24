@@ -7,7 +7,7 @@ def manage_topics_menu(data):
         print("No topics yet!")
     else:
         print("\nCurrent list of topics:")
-        menu_utils.print_numbered_topics(topics.list_topics(data))
+        menu_utils.print_numbered_list(topics.list_topics(data))
     
     while True:
         print("1. List topics with details")
@@ -33,7 +33,7 @@ def manage_topics_menu(data):
             if added:
                 print("Topic added!")
                 print("\nUpdated list of topics:\n")
-                menu_utils.print_numbered_topics(topics.list_topics(data))
+                menu_utils.print_numbered_list(topics.list_topics(data))
             elif reason == "empty":
                 print("Topic could not be empty!\n")
             elif reason == "duplicate":
@@ -49,7 +49,7 @@ def manage_topics_menu(data):
             if deleted:
                 print("Topic deleted!")
                 print("\nUpdated list of topics:\n")
-                menu_utils.print_numbered_topics(topics.list_topics(data))
+                menu_utils.print_numbered_list(topics.list_topics(data))
 
         elif manage_choice == "4":
             topic_name = menu_utils.choose_topic_from_enumerated_list(topics.list_topics(data))

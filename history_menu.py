@@ -20,8 +20,8 @@ def manage_history_menu(data):
             if not history_topic_list:
                 print("No history yet!\n")
                 continue
-            print("\nCurrent list if history topics:")
-            menu_utils.print_numbered_topics(history_topic_list)
+            print("\nCurrent list of history topics:")
+            menu_utils.print_numbered_list(history_topic_list)
             topic_name = menu_utils.choose_topic_from_enumerated_list(history_topic_list)
             if not topic_name:
                 continue
