@@ -175,7 +175,7 @@ def test_get_unique_conversations_topics():
          
         "conversations": [
             {
-            "topic": "recursion", 
+            "topic": "Recursion", 
             "ai_mode": "socratic tutor", 
             "messages": [
                 {"role": "user",
@@ -206,7 +206,7 @@ def test_get_unique_conversations_topics():
 
     conversation_topics_list = conversations.get_unique_conversations_topics(data)
 
-    assert conversation_topics_list == ["recursion", "classes"]
+    assert conversation_topics_list == ["Recursion", "classes"]
 
 def test_count_conversations_by_topic():
     data = {

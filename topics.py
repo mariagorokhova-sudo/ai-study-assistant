@@ -11,7 +11,7 @@ def add_topic(data, name):
     new_topic = {
         "name": name,
         "status": "new",
-        "notes": ""
+        "notes": []
     }
     for topic in data["topics"]:
         if topic["name"].lower() == new_topic["name"].lower():
@@ -32,7 +32,7 @@ def delete_topic(data, name):
     if not name:
         return False, "empty"
     for topic in data["topics"]:
-        if topic["name"] == name:
+        if topic["name"].lower() == name.lower():
             data["topics"].remove(topic)
             storage.save_topics(data)
             return True, "deleted"

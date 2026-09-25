@@ -32,69 +32,6 @@ def test_load_topics_when_file_does_not_exist(tmp_path, monkeypatch):
 
     assert loaded_data == {"topics": [], "conversations": []}
 
-def test_load_topics_when_exisiting_file_has_no_conversations(tmp_path, monkeypatch):
-    test_file = tmp_path/"test_topics_wo_conversations.json"
-    monkeypatch.setattr(storage, "DATA_FILE", test_file)
-
-    data = {
-        "topics": [
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": []
-            }
-        ]
-    }
-
-    storage.save_topics(data)
-
-    assert test_file.exists()
-
-    loaded_data = storage.load_topics()
-
-    assert loaded_data == {
-        "topics": [
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": []
-            }
-        ],
-        "conversations": []
-    }
-
-def test_load_topics_converts_old_notes_to_list(tmp_path, monkeypatch):
-    test_file = tmp_path/"test_topics_with_old_notes.json"
-    monkeypatch.setattr(storage, "DATA_FILE", test_file)
-
-    data = {
-        "topics": [
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": ""
-            }
-        ],
-        "conversations": []
-    }
-
-    storage.save_topics(data)
-
-    assert test_file.exists()
-
-    loaded_data = storage.load_topics()
-
-    assert loaded_data == {
-        "topics": [
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": []
-            }
-        ],
-        "conversations": []
-    }
-
 def test_save_new_conversation(tmp_path, monkeypatch):
     test_file = tmp_path/"test_conversations.json"
 

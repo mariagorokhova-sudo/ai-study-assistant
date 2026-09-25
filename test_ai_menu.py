@@ -11,7 +11,6 @@ def test_ai_api_error():
     with patch("builtins.input") as mock_input:
         with patch("ai_menu.topics.list_topics") as mock_list_topics:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
-                with patch("ai_menu.storage.save_topics") as mock_save:
                     with patch("ai_menu.conversations.create_conversation") as mock_conversation:                     
                         with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
                             with patch("builtins.print") as mock_print:
@@ -92,7 +91,7 @@ def test_other_topic_option():
                         "/exit"
                     ]
 
-                    mock_ask.return_value == "A binary tree is a ..."
+                    mock_ask.return_value = "A binary tree is a ..."
 
                     ai_menu.manage_ai_menu(data)
 
@@ -202,6 +201,26 @@ def test_choose_existing_conversation_to_continue():
                             assert existing_conversation["messages"][-1] == {"role": "assistant",
                                                                              "content": "Without one the function will call itself forever causing the program to crash."}
                             mock_save.assert_called_once_with(data)
+
+def test_ai_menu_empty_question():
+    data = {"topics": [],  "conversations": []}
+    with patch("ai_menu.topics.list_topics") as mock_list_topics:
+        with patch("builtins.input", side_effect = ["1", "1", "1", "  ", "/exit"]):
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                with patch("ai_menu.conversations.create_conversation") as mock_conversation:
+                    with patch("ai_menu.storage.save_topics") as mock_save:
+                        with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
+                            with patch("builtins.print") as mock_print:
+                                mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
+
+                                ai_menu.manage_ai_menu(data)
+
+                                mock_ask.assert_not_called()
+                                mock_conversation.assert_not_called()
+                                mock_message.assert_not_called()
+                                mock_print.assert_any_call("Question cannot be empty, please try again.")
+
+
 
 
 

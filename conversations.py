@@ -21,7 +21,7 @@ def get_last_user_message(conversation_entry):
 def get_unique_conversations_topics(data):
     conversation_topics_list = []
     for conversation_entry in data["conversations"]:
-        if conversation_entry["topic"] not in conversation_topics_list:
+        if find_matching_topic_case_insensitive(conversation_entry["topic"], conversation_topics_list) is None:
             conversation_topics_list.append(conversation_entry["topic"])
     return conversation_topics_list
 

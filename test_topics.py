@@ -14,7 +14,7 @@ def test_add_topic():
             {
                 "name": "recursion",
                 "status": "new",
-                "notes": ""
+                "notes": []
             }
         ]
         mock_save.assert_called_once_with(data)
@@ -119,7 +119,7 @@ def test_delete_topic():
     }
 
     with patch("topics.storage.save_topics") as mock_save:
-        deleted, reason = topics.delete_topic(data, "recursion")
+        deleted, reason = topics.delete_topic(data, "Recursion")
 
         assert deleted is True
         assert reason == "deleted"

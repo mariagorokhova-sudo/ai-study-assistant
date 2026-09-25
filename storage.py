@@ -7,10 +7,6 @@ def load_topics():
     if DATA_FILE.exists():
         with DATA_FILE.open("r") as file:
             data = json.load(file)
-            data.setdefault("conversations", [])
-            for entry in data["topics"]:
-                if entry["notes"] == "":
-                    entry["notes"] = []
             return data
     return {"topics":[], "conversations": []}
 

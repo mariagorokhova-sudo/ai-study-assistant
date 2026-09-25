@@ -33,9 +33,12 @@ def manage_ai_menu(data):
             return
 
     while True:
-        question = input("Please enter your question or /exit: ")
+        question = input("Please enter your question or /exit: ").strip()
         if question == "/exit":
             break
+        if not question:
+            print("Question cannot be empty, please try again.")
+            continue
         
         if conversation_entry == "new":
             conversation_entry = conversations.create_conversation(data, topic_name, ai_mode)

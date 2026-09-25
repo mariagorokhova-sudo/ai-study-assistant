@@ -66,8 +66,8 @@ def build_instructions(topic_name, ai_mode):
 
     elif ai_mode == "Examiner":
         instructions = f"""
-        You are a examiner assessing a first-year Computer Science student on {topic_name}.
-        Ask one question at a time and wait for the ctudent's response before continuing.
+        You are an examiner assessing a first-year Computer Science student on {topic_name}.
+        Ask one question at a time and wait for the student's response before continuing.
         Mix open-ended and multiple-choice questions. Do not reveal the correct answer before the student responds.
         After each response state whether it is correct, partially correct, or incorrect.
         Briefly explain any mistakes or missing points before asking the next question.

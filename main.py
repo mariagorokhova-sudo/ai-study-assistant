@@ -1,11 +1,15 @@
+import json
 import topics
 import topics_menu
 import conversations_menu
 import ai_menu
 
-data = topics.load_data()
-
 def main():
+    try:
+        data = topics.load_data()
+    except json.JSONDecodeError:
+        print("JSON file is corrupted and cannot be read.")
+        return
     while True:
         print("\nAI Study Assistant")
         print("1. Manage topics")

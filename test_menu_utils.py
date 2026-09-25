@@ -22,7 +22,7 @@ def test_choose_from_numbered_list():
 @pytest.mark.parametrize("wrong_input", ["abc", "99", "0"])
 def test_choose_from_numbered_list_wrong_input(wrong_input):
     topic_names_list = ["Recursion", "Classes"]
-    with patch("builtins.input", side_effect=wrong_input):
+    with patch("builtins.input", return_value=wrong_input):
         with patch("builtins.print") as mock_print:
             menu_utils.choose_from_numbered_list(topic_names_list)
 
@@ -87,29 +87,6 @@ def test_print_numbered_conversations_empty_list():
         menu_utils.print_numbered_conversations(conversations_list)
 
         mock_print.assert_any_call("No conversations yet!\n")
-
-def test_print_all_conversation_messages():
-    conversation_entry = {
-        "topic": "recursion",
-        "ai_mode": "Socratic tutor",
-        "messages": [
-            {
-                "role": "user",
-                "content": "What is recursion?"
-            },
-            {
-                "role": "assistant",
-                "content": "It's when a function calls itself."
-            }
-        ]
-    }
-    with patch("builtins.print") as mock_print:
-
-        menu_utils.print_all_conversation_messages(conversation_entry)
-
-        mock_print.assert_any_call("AI mode: Socratic tutor\n")
-        mock_print.assert_any_call("User: What is recursion?\n")
-        mock_print.assert_any_call("Assistant: It's when a function calls itself.\n")
 
 def test_print_all_conversation_messages():
     conversation_entry = {
