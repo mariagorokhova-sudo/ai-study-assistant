@@ -1,7 +1,7 @@
 import conversations
 
 def test_create_conversation():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     topic = "recursion"
     ai_mode = "socratic tutor"
 
@@ -9,7 +9,7 @@ def test_create_conversation():
 
     assert data == {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -28,7 +28,7 @@ def test_create_conversation():
 def test_add_message_to_existing_conversation():
     data = {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -44,7 +44,7 @@ def test_add_message_to_existing_conversation():
 
     assert data == {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -59,7 +59,7 @@ def test_add_message_to_existing_conversation():
 def test_add_second_message_to_conversation():
     data = {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -78,7 +78,7 @@ def test_add_second_message_to_conversation():
 
     assert data == {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -95,7 +95,7 @@ def test_add_second_message_to_conversation():
 def test_get_conversations_by_topic():
     data = {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -172,7 +172,7 @@ def test_get_last_user_message():
 def test_get_unique_conversations_topics():
     data = {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 
@@ -211,7 +211,7 @@ def test_get_unique_conversations_topics():
 def test_count_conversations_by_topic():
     data = {
         "topics": [], 
-        "history": [], 
+         
         "conversations": [
             {
             "topic": "recursion", 

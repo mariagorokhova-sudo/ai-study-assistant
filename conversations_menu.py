@@ -1,8 +1,7 @@
-import history
 import menu_utils
 import conversations
 
-def manage_history_menu(data):
+def manage_conversations_menu(data):
     while True:
         print("\n1. View all conversations")
         print("2. View conversations on specific topic")

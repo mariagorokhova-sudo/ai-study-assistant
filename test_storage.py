@@ -14,7 +14,6 @@ def test_save_topics(tmp_path, monkeypatch):
                 "notes": []
             }
         ],
-        "history": [],
         "conversations": []
     }
 
@@ -31,10 +30,10 @@ def test_load_topics_when_file_does_not_exist(tmp_path, monkeypatch):
 
     loaded_data = storage.load_topics()
 
-    assert loaded_data == {"topics": [], "history": [], "conversations": []}
+    assert loaded_data == {"topics": [], "conversations": []}
 
-def test_load_topics_when_exisiting_file_has_no_history_and_conversation(tmp_path, monkeypatch):
-    test_file = tmp_path/"test_topics_wo_history.json"
+def test_load_topics_when_exisiting_file_has_no_conversations(tmp_path, monkeypatch):
+    test_file = tmp_path/"test_topics_wo_conversations.json"
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
     data = {
@@ -61,12 +60,11 @@ def test_load_topics_when_exisiting_file_has_no_history_and_conversation(tmp_pat
                 "notes": []
             }
         ],
-        "history": [],
         "conversations": []
     }
 
 def test_load_topics_converts_old_notes_to_list(tmp_path, monkeypatch):
-    test_file = tmp_path/"test_topics_wo_history.json"
+    test_file = tmp_path/"test_topics_with_old_notes.json"
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
     data = {
@@ -77,7 +75,6 @@ def test_load_topics_converts_old_notes_to_list(tmp_path, monkeypatch):
                 "notes": ""
             }
         ],
-        "history": [],
         "conversations": []
     }
 
@@ -95,7 +92,6 @@ def test_load_topics_converts_old_notes_to_list(tmp_path, monkeypatch):
                 "notes": []
             }
         ],
-        "history": [],
         "conversations": []
     }
 
@@ -104,7 +100,7 @@ def test_save_new_conversation(tmp_path, monkeypatch):
 
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [], "conversations": []}
     topic = "recursion"
     ai_mode = "socratic tutor"
 
@@ -122,7 +118,6 @@ def test_save_new_conversation(tmp_path, monkeypatch):
 
     assert loaded_data == {
         "topics": [], 
-        "history": [], 
         "conversations": [
             {
             "topic": "recursion", 

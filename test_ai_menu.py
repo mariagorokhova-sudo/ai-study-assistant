@@ -7,7 +7,7 @@ from unittest.mock import patch, call
 import pytest
 
 def test_ai_api_error():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("builtins.input") as mock_input:
         with patch("ai_menu.topics.list_topics") as mock_list_topics:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
@@ -35,7 +35,7 @@ def test_ai_api_error():
                                     mock_save.assert_called_once_with(data)
 
 def test_ai_request_success_add_messages_to_conversation():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("builtins.input") as mock_input:
         with patch("ai_menu.topics.list_topics") as mock_list_topics:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
@@ -64,7 +64,7 @@ def test_ai_request_success_add_messages_to_conversation():
                             mock_save.assert_called_once_with(data)
 
 def test_invalid_topic_input():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("builtins.input", side_effect = ["abc"]):
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
             with patch("ai_menu.topics.list_topics") as mock_list_topics:
@@ -77,7 +77,7 @@ def test_invalid_topic_input():
                     mock_ask.assert_not_called()
 
 def test_other_topic_option():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input") as mock_input:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
@@ -101,7 +101,7 @@ def test_other_topic_option():
 
 @pytest.mark.parametrize("edge_choice", ["0", "99"])
 def test_invalid_topic_input_edge_cases(edge_choice):
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("builtins.input", side_effect = [edge_choice]):
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
             with patch("ai_menu.topics.list_topics") as mock_list_topics:
@@ -116,7 +116,7 @@ def test_invalid_topic_input_edge_cases(edge_choice):
                         mock_save.assert_not_called()
 
 def test_ai_menu_create_conversation_success():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
             with patch("builtins.input", side_effect = ["2", "1", "2", "what is inheritance?", "/exit"]):
@@ -129,7 +129,7 @@ def test_ai_menu_create_conversation_success():
                         mock_conversation.assert_called_once_with(data, "classes", "Socratic tutor")
 
 def test_ai_menu_exit_from_ai_conversation():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input", side_effect = ["2", "2", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
@@ -144,7 +144,7 @@ def test_ai_menu_exit_from_ai_conversation():
                         mock_save.assert_not_called()
 
 def test_ai_menu_continuing_conversation():
-    data = {"topics": [], "history": [], "conversations": []}
+    data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input", side_effect = ["2", "1", "2", "What is inheritance?", "Can you give me an example?", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
@@ -182,7 +182,7 @@ def test_choose_existing_conversation_to_continue():
                 {"role": "assistant",
                 "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
         }
-    data = {"topics": [], "history": [], "conversations": [existing_conversation]}
+    data = {"topics": [],  "conversations": [existing_conversation]}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input", side_effect = ["1", "1", "Why do we need a base case?", "/exit"]):
             with patch("ai_menu.conversations.get_conversations_by_topic") as mock_conversations_list:

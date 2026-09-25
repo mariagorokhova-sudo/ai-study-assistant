@@ -118,7 +118,7 @@ def test_topics_menu_add_new_note():
                 mock_add_note.assert_called_once_with(data, "binary trees", "Tree has a root node")
 
 def test_topics_menu_add_new_note_empty_list():
-    data = {"topics":[], "history": []}
+    data = {"topics":[], "conversations": []}
     with patch("builtins.input", side_effect = ["5", "6"]):
         with patch("menu_utils.choose_from_numbered_list") as mock_choice:
             with patch("topics_menu.topics.add_note") as mock_add_note:
@@ -142,7 +142,7 @@ def test_topic_menu_get_topics_with_details():
                 "notes": []
             }
         ],
-        "history": []
+        "conversations": []
     }
     with patch("builtins.input", side_effect = ["1", "6"]):
         with patch("topics_menu.menu_utils.print_numbered_topics_with_details") as mock_print_numbered_topics:

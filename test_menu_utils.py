@@ -50,7 +50,7 @@ def test_print_numbered_topics_with_details():
                 "notes": []
             }
         ],
-        "history": []
+        "conversations": []
     }
     with patch("builtins.print") as mock_print:
         menu_utils.print_numbered_topics_with_details(data)
