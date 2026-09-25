@@ -6,7 +6,7 @@ def manage_history_menu(data):
     while True:
         print("\n1. View all conversations")
         print("2. View conversations on specific topic")
-        print("3. View conversation counts by topic")
+        print("3. View conversations counts by topic")
         print("4. Back")
 
         choice_history = input("Please choose an option: ").strip()
@@ -27,18 +27,19 @@ def manage_history_menu(data):
                 continue
             conversations_list = conversations.get_conversations_by_topic(data, topic_name)
             menu_utils.print_numbered_conversations(conversations_list, include_new_option=False)
+            print("\nYou can view all messages by choosing a conversation\n")
             conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=False)
             if conversation_entry is None:
                 continue
             menu_utils.print_all_conversation_messages(conversation_entry)
 
         elif choice_history == "3":
-            topic_counts = history.count_history_by_topics(data)
-            if not topic_counts:
-                print("No history yet!\n")
+            conversation_counts = conversations.count_conversations_by_topic(data)
+            if not conversation_counts:
+                print("No conversations yet!\n")
                 continue
-            counts_sorted = history.sort_topics_counts_descending(topic_counts)
-            print("\nHistory topics by counts descending:\n")
+            counts_sorted = conversations.sort_conversations_counts_descending(conversation_counts)
+            print("\nConversations topics by counts descending:\n")
             for topic, count in counts_sorted:
                 print(f"{topic}: {count}")
         

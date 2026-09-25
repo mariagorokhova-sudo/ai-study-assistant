@@ -208,6 +208,61 @@ def test_get_unique_conversations_topics():
 
     assert conversation_topics_list == ["recursion", "classes"]
 
+def test_count_conversations_by_topic():
+    data = {
+        "topics": [], 
+        "history": [], 
+        "conversations": [
+            {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            },
+            {
+            "topic": "Recursion", 
+            "ai_mode": "Debugger", 
+            "messages": [
+                {"role": "user",
+                "content": "Question on debugging?"},
+                {"role": "assistant",
+                "content": "Answer on debugging"}]
+            },
+            {
+                "topic": "classes", 
+                "ai_mode": "socratic tutor", 
+                "messages": [
+                    {"role": "user",
+                    "content": "What is inheritance"},
+                    {"role": "assistant",
+                    "content": "Inheritance lets one class reuse another class."}]
+            }
+        ]
+    }
+
+    result = conversations.count_conversations_by_topic(data)
+
+    assert result == {"recursion": 2, "classes": 1}
+
+def test_sorting_conversation_counts_descending():
+    counts = {
+        "classes": 1,
+        "recursion": 2,
+        "algorithms": 2
+    }
+
+    result = conversations.sort_conversations_counts_descending(counts)
+
+    assert result == [
+        ("algorithms", 2),
+        ("recursion", 2),
+        ("classes", 1)
+    ]
+
+
 
 
 

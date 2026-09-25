@@ -24,4 +24,22 @@ def get_unique_conversations_topics(data):
         if conversation_entry["topic"] not in conversation_topics_list:
             conversation_topics_list.append(conversation_entry["topic"])
     return conversation_topics_list
+
+def count_conversations_by_topic(data):
+    counts = {}
+    for entry in data["conversations"]:
+        topic = entry["topic"]
+        matching_topic = find_matching_topic_case_insensitive(topic, counts)
+        if matching_topic is None:
+            counts[topic] = 1
+        else:
+            counts[matching_topic] += 1
+    return counts
+
+def find_matching_topic_case_insensitive(topic, existing_topics):
+    for existing_topic in existing_topics:
+        if topic.lower() == existing_topic.lower():
+            return existing_topic
     
+def sort_conversations_counts_descending(counts):
+    return sorted(counts.items(), key=lambda item: (-item[1], item[0]))
