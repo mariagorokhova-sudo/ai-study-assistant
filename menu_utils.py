@@ -9,7 +9,7 @@ def print_numbered_list(options_list, include_other_option=False):
     else:
         print("\n")
 
-def choose_from_numbered_list(options_list, include_other_option=False):
+def choose_from_numbered_list(options_list, include_other_option=False, prompt="Please choose an option from the list above: "):
     if not options_list and not include_other_option:
         print("No options yet!\n")
         return
@@ -17,7 +17,7 @@ def choose_from_numbered_list(options_list, include_other_option=False):
     if include_other_option:
         last_option+=1
     try:    
-        user_choice = int(input("Please choose an option from the list above: ")) 
+        user_choice = int(input(prompt)) 
     except ValueError:
         print("Invalid option!\n")
         return
@@ -57,7 +57,7 @@ def print_numbered_conversations(conversations_list, include_new_option=True):
     print("===================================================================================\n")
     for number, conversation in enumerate(conversations_list, start=1):
         last_user_message = conversations.get_last_user_message(conversation)
-        print(f'{number}. AI mode: {conversation["ai_mode"]} | Last question: {last_user_message}')
+        print(f'{number}. Topic: {conversation["topic"]} | AI mode: {conversation["ai_mode"]} | Last question: {last_user_message}')
         print("-----------------------------------------------------------------------------------\n")
     if include_new_option:
         last_option = len(conversations_list)+1
@@ -69,7 +69,8 @@ def print_all_conversation_messages(conversation_entry):
     print(f'AI mode: {conversation_entry["ai_mode"]}')
     print("-----------------------------------------------------------------------------------\n")
     for entry in conversation_entry["messages"]:
-        print(f'{entry["role"].capitalize()}: {entry["content"]}\n')
+        print(f'{entry["role"].capitalize()}: {entry["content"]}')
+        print("-----------------------------------------------------------------------------------\n")
 
 
 

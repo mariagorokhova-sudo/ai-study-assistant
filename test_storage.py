@@ -86,6 +86,18 @@ def test_save_new_conversation(tmp_path, monkeypatch):
         ]
     }
 
+def test_damaged_json_file(tmp_path, monkeypatch):
+    test_file = tmp_path/"test_file.json"
+    invalid_json = '{"topics": ['
+    with test_file.open("w") as file:
+        file.write(invalid_json)
+    monkeypatch.setattr(storage, "DATA_FILE", test_file)
+    with pytest.raises(ValueError, match="Invalid JSON file"):
+        storage.load_topics()
+
+
+
+
 
 
 

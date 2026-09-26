@@ -5,6 +5,7 @@ import openai
 import httpx
 from unittest.mock import patch, call
 import pytest
+import conversations
 
 def test_ai_api_error():
     data = {"topics": [],  "conversations": []}
@@ -12,7 +13,7 @@ def test_ai_api_error():
         with patch("ai_menu.topics.list_topics") as mock_list_topics:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                     with patch("ai_menu.conversations.create_conversation") as mock_conversation:                     
-                        with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
+                        with patch("ai_menu.conversations.add_message_to_conversation", wraps=conversations.add_message_to_conversation) as mock_message:
                             with patch("builtins.print") as mock_print:
                                 with patch("ai_menu.storage.save_topics") as mock_save:
                                     mock_input.side_effect = [
@@ -32,6 +33,7 @@ def test_ai_api_error():
                                     mock_print.assert_any_call("Sorry, the AI request failed. Please try again.")
                                     mock_message.assert_called_once_with(mock_conversation.return_value, "user", "what is recursion?")
                                     mock_save.assert_called_once_with(data)
+                                    assert mock_conversation.return_value["messages"] == []
 
 def test_ai_request_success_add_messages_to_conversation():
     data = {"topics": [],  "conversations": []}
@@ -81,22 +83,24 @@ def test_other_topic_option():
         with patch("builtins.input") as mock_input:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.storage.save_topics") as mock_save:
-                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
-                    mock_input.side_effect = [
-                        "4",
-                        "binary trees",
-                        "1",
-                        "1",
-                        "what is a binary tree?",
-                        "/exit"
-                    ]
+                    with patch("ai_menu.topics.add_topic") as mock_add_topic:
+                        mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                        mock_input.side_effect = [
+                            "4",
+                            "binary trees",
+                            "1",
+                            "1",
+                            "what is a binary tree?",
+                            "/exit"
+                        ]
 
-                    mock_ask.return_value = "A binary tree is a ..."
+                        mock_ask.return_value = "A binary tree is a ..."
 
-                    ai_menu.manage_ai_menu(data)
+                        ai_menu.manage_ai_menu(data)
 
-                    mock_ask.assert_called_once_with(
-                        data["conversations"][0])
+                        mock_ask.assert_called_once_with(
+                            data["conversations"][0])
+                        mock_add_topic.assert_called_once_with(data, "binary trees")
 
 @pytest.mark.parametrize("edge_choice", ["0", "99"])
 def test_invalid_topic_input_edge_cases(edge_choice):

@@ -11,7 +11,7 @@ def manage_ai_menu(data):
     print("Current list of topics:")
     print("==================================================================================\n")
     menu_utils.print_numbered_list(topics_list, include_other_option=True)
-    topic_name = menu_utils.choose_from_numbered_list(topics_list, include_other_option=True)
+    topic_name = menu_utils.choose_from_numbered_list(topics_list, include_other_option=True, prompt="Please choose a topic to discuss with AI: ")
     if topic_name is None:
         return
     if topic_name == "new":
@@ -20,11 +20,12 @@ def manage_ai_menu(data):
         if not topic_name:
             print("Topic name cannot be empty!\n")
             return
-    print(f"\nYou've chosen {topic_name} topic.")
+        topics.add_topic(data, topic_name)
+    print(f"\nYou've chosen {topic_name}.")
 
     conversations_list = conversations.get_conversations_by_topic(data, topic_name)
     menu_utils.print_numbered_conversations(conversations_list)
-    conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=True)
+    conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=True, prompt="Please choose an option to continue or start a new conversation: ")
 
     if conversation_entry is None:
         return
@@ -34,9 +35,9 @@ def manage_ai_menu(data):
         ai_modes_list = ["Tutor", "Socratic tutor", "Debugger", "Code reviewer", "Examiner"]
         print("\n===================")
         print("\nAvailable AI modes:\n")
-        print("\n===================")
+        print("===================\n")
         menu_utils.print_numbered_list(ai_modes_list)
-        ai_mode = menu_utils.choose_from_numbered_list(ai_modes_list)
+        ai_mode = menu_utils.choose_from_numbered_list(ai_modes_list, prompt="Please choose AI learning mode: ")
         if not ai_mode:
             return
 
@@ -59,6 +60,7 @@ def manage_ai_menu(data):
             print(f"\n{answer}")
             conversations.add_message_to_conversation(conversation_entry, "assistant", answer)
         except openai.APIError as error:
+            conversation_entry["messages"].pop()
             print("Sorry, the AI request failed. Please try again.")
             print(error)
         storage.save_topics(data)

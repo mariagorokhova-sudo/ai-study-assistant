@@ -1,4 +1,3 @@
-import json
 import topics
 import topics_menu
 import conversations_menu
@@ -7,7 +6,7 @@ import ai_menu
 def main():
     try:
         data = topics.load_data()
-    except json.JSONDecodeError:
+    except ValueError:
         print("JSON file is corrupted and cannot be read.")
         return
     while True:

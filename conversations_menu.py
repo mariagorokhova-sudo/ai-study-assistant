@@ -26,14 +26,13 @@ def manage_conversations_menu(data):
             print("Current list of conversation topics:")
             print("===================================================================================\n")
             menu_utils.print_numbered_list(conversation_topics_list)
-            topic_name = menu_utils.choose_from_numbered_list(conversation_topics_list)
+            topic_name = menu_utils.choose_from_numbered_list(conversation_topics_list, prompt="Please choose a topic to view history on: ")
             if not topic_name:
                 continue
-            print(f"You've chosen to view all conversations about {topic_name}")
+            print(f"You've chosen to view all conversations about {topic_name}.")
             conversations_list = conversations.get_conversations_by_topic(data, topic_name)
             menu_utils.print_numbered_conversations(conversations_list, include_new_option=False)
-            print("\nYou can view all messages by choosing a conversation.\n")
-            conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=False)
+            conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=False, prompt="Please choose a conversation to view all messages in it: ")
             if conversation_entry is None:
                 continue
             menu_utils.print_all_conversation_messages(conversation_entry)

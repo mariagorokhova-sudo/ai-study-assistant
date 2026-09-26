@@ -78,7 +78,7 @@ def test_print_numbered_conversations():
         
         menu_utils.print_numbered_conversations(conversations_list)
 
-        mock_print.assert_any_call("1. AI mode: Socratic tutor | Last question: What is recursion?")
+        mock_print.assert_any_call("1. Topic: recursion | AI mode: Socratic tutor | Last question: What is recursion?")
         mock_print.assert_any_call("2. Start new conversation\n")
 
 def test_print_numbered_conversations_empty_list():
@@ -108,8 +108,8 @@ def test_print_all_conversation_messages():
         menu_utils.print_all_conversation_messages(conversation_entry)
 
         mock_print.assert_any_call("AI mode: Socratic tutor")
-        mock_print.assert_any_call("User: What is recursion?\n")
-        mock_print.assert_any_call("Assistant: It's when a function calls itself.\n")
+        mock_print.assert_any_call("User: What is recursion?")
+        mock_print.assert_any_call("Assistant: It's when a function calls itself.")
 
 def test_choose_from_numbered_list_without_other_option():
     options_list = [
@@ -133,6 +133,16 @@ def test_choose_from_numbered_list_without_other_option():
        result = menu_utils.choose_from_numbered_list(options_list, include_other_option=False)
 
        assert result == options_list[0]
+
+def test_adding_custom_propmt_to_choose_from_numbered_list():
+    topic_list = ["recursion", "classes"]
+    with patch("builtins.input", return_value="1") as mock_input:
+        result = menu_utils.choose_from_numbered_list(topic_list, prompt="Please choose a topic: ")
+
+        mock_input.assert_called_once_with("Please choose a topic: ")
+        assert result == "recursion" 
+
+
     
 
 

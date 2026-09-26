@@ -57,7 +57,7 @@ def manage_topics_menu(data):
                 print("Current list of topics:")
                 print("===========================\n")
                 menu_utils.print_numbered_list(topics.list_topics(data))
-            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data), prompt="Please choose a topic to delete: ")
             if not topic_name:
                 continue
             print(f"\nYou've chosen: {topic_name}")
@@ -76,7 +76,7 @@ def manage_topics_menu(data):
             print("Current list of topics:")
             print("===========================\n")
             menu_utils.print_numbered_list(topics.list_topics(data))
-            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data), prompt="Please choose a topic to change status: ")
             if not topic_name:
                 continue
             print(f"You've chosen: {topic_name}")
@@ -90,11 +90,12 @@ def manage_topics_menu(data):
                 print("Invalid status!\n")
 
         elif manage_choice == "5":
+            print("You've chosen to add a note to the topic.")
             print("\n==================================================================================")
             print("Current list of topics:")
             print("==================================================================================\n")
             menu_utils.print_numbered_list(topics.list_topics(data))
-            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data), prompt="Please choose a topic to add note: ")
             if not topic_name:
                 continue
             print(f"You've chosen: {topic_name}")
