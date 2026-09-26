@@ -197,13 +197,13 @@ def test_change_topic_status():
                 {
                     "name": "recursion",
                     "status": "new",
-                    "notes": ""
+                    "notes": []
                 }
             ]
         }
 
         topic_name = "Recursion"
-        new_status = "in progress"
+        new_status = " In Progress "
 
         topics.change_topic_status(data, topic_name, new_status)
 
@@ -211,7 +211,7 @@ def test_change_topic_status():
             {
                 "name": "recursion",
                 "status": "in progress",
-                "notes": ""
+                "notes": []
             }
         ]
        

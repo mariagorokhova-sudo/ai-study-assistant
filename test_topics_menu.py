@@ -43,7 +43,7 @@ def test_delete_topic_option_success():
 
                         mock_delete.assert_called_once_with(data, "recursion")
                         mock_print.assert_any_call("Topic deleted!")
-                        assert mock_print_numbered_topics.call_count == 2
+                        assert mock_print_numbered_topics.call_count == 3
 
 def test_change_topic_status_success():
     data = {

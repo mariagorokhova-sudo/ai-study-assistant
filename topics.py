@@ -39,6 +39,7 @@ def delete_topic(data, name):
     return False, "not found"
 
 def change_topic_status(data, topic_name, new_status):
+    new_status = new_status.strip().lower()
     valid_statuses = {"new", "in progress", "exam prep", "finished"}
     if new_status not in valid_statuses:
         return False, "invalid status"
@@ -54,7 +55,7 @@ def add_note(data, topic_name, new_note):
         return False, "empty note"
     for entry in data["topics"]:
         if topic_name.lower() == entry["name"].lower():
-            entry["notes"].append(new_note)
+            entry["notes"].append(new_note.strip())
             storage.save_topics(data)
             return True, "added"
     return False, "topic not found"

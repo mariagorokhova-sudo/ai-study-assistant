@@ -6,16 +6,21 @@ def manage_topics_menu(data):
     if not data["topics"]:
         print("No topics yet!")
     else:
-        print("\nCurrent list of topics:")
+        print("\n===========================")
+        print("Current list of topics:")
+        print("===========================\n")
         menu_utils.print_numbered_list(topics.list_topics(data))
     
     while True:
+        print("===================================================================================")
+        print("You can choose from the following options:\n")
         print("1. List topics with details")
         print("2. Add topic")
         print("3. Delete topic")
         print("4. Change topic status")
         print("5. Add new note")
-        print("6. Back")
+        print("6. Back\n")
+        print("===================================================================================\n")
 
         manage_choice = input("Please choose an option: ").strip()
 
@@ -26,13 +31,16 @@ def manage_topics_menu(data):
                 menu_utils.print_numbered_topics_with_details(data)
 
         elif manage_choice == "2":
+            print("You've chosen to add topic.")
             topic_name = input("Please enter a topic name: ")
             print(f"\nYou've entered: {topic_name}")
             added, reason = topics.add_topic(data, topic_name)
     
             if added:
                 print("Topic added!")
-                print("\nUpdated list of topics:\n")
+                print("\n==================================================================================")
+                print("Updated list of topics:")
+                print("==================================================================================\n")
                 menu_utils.print_numbered_list(topics.list_topics(data))
             elif reason == "empty":
                 print("Topic could not be empty!\n")
@@ -40,6 +48,15 @@ def manage_topics_menu(data):
                 print("Topic already exists!\n")
 
         elif manage_choice == "3":
+            if not data["topics"]:
+                print("No topics yet!")
+                continue
+            else:
+                print("You've chosen to delete topic.")
+                print("\n===========================")
+                print("Current list of topics:")
+                print("===========================\n")
+                menu_utils.print_numbered_list(topics.list_topics(data))
             topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue
@@ -48,10 +65,17 @@ def manage_topics_menu(data):
 
             if deleted:
                 print("Topic deleted!")
-                print("\nUpdated list of topics:\n")
+                print("\n===================================================================================")
+                print("Updated list of topics:")
+                print("===================================================================================\n")
                 menu_utils.print_numbered_list(topics.list_topics(data))
 
         elif manage_choice == "4":
+            print("You've chosen to change topic status.")
+            print("\n===========================")
+            print("Current list of topics:")
+            print("===========================\n")
+            menu_utils.print_numbered_list(topics.list_topics(data))
             topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue
@@ -66,6 +90,10 @@ def manage_topics_menu(data):
                 print("Invalid status!\n")
 
         elif manage_choice == "5":
+            print("\n==================================================================================")
+            print("Current list of topics:")
+            print("==================================================================================\n")
+            menu_utils.print_numbered_list(topics.list_topics(data))
             topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data))
             if not topic_name:
                 continue

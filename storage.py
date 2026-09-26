@@ -7,6 +7,12 @@ def load_topics():
     if DATA_FILE.exists():
         with DATA_FILE.open("r") as file:
             data = json.load(file)
+            if (
+                not isinstance(data, dict) 
+                or not isinstance(data.get("topics"), list) 
+                or not isinstance(data.get("conversations"), list)
+            ):
+                raise ValueError("Invalid data structure.")
             return data
     return {"topics":[], "conversations": []}
 

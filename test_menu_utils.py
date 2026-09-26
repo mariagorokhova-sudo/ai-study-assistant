@@ -55,12 +55,12 @@ def test_print_numbered_topics_with_details():
     with patch("builtins.print") as mock_print:
         menu_utils.print_numbered_topics_with_details(data)
 
-        mock_print.assert_any_call("1. recursion")
+        mock_print.assert_any_call("1. recursion\n")
         mock_print.assert_any_call("Status: in progress")
         mock_print.assert_any_call("Notes:")
         mock_print.assert_any_call("- note 1")
         mock_print.assert_any_call("- note 2")
-        mock_print.assert_any_call("2. classes")
+        mock_print.assert_any_call("2. classes\n")
         mock_print.assert_any_call("Status: new")
         mock_print.assert_any_call("Notes: no notes yet!\n")
 
@@ -107,7 +107,7 @@ def test_print_all_conversation_messages():
 
         menu_utils.print_all_conversation_messages(conversation_entry)
 
-        mock_print.assert_any_call("AI mode: Socratic tutor\n")
+        mock_print.assert_any_call("AI mode: Socratic tutor")
         mock_print.assert_any_call("User: What is recursion?\n")
         mock_print.assert_any_call("Assistant: It's when a function calls itself.\n")
 
