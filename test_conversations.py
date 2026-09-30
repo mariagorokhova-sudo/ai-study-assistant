@@ -1,4 +1,5 @@
 import conversations
+from unittest.mock import patch
 
 def test_create_conversation():
     data = {"topics": [],  "conversations": []}
@@ -24,6 +25,7 @@ def test_create_conversation():
             "ai_mode": "socratic tutor", 
             "messages": []
             }
+
 
 def test_add_message_to_existing_conversation():
     data = {
@@ -55,6 +57,7 @@ def test_add_message_to_existing_conversation():
             }
         ]
     }
+
 
 def test_add_second_message_to_conversation():
     data = {
@@ -91,6 +94,7 @@ def test_add_second_message_to_conversation():
             }
         ]
     }
+
 
 def test_get_conversations_by_topic():
     data = {
@@ -150,6 +154,7 @@ def test_get_conversations_by_topic():
             "content": "Answer on debugging"}]
         }]
 
+
 def test_get_last_user_message():
     conversation_entry = {
         "topic": "recursion", 
@@ -168,6 +173,7 @@ def test_get_last_user_message():
     last_user_message = conversations.get_last_user_message(conversation_entry)
 
     assert last_user_message == "What is recursion?"
+
 
 def test_get_unique_conversations_topics():
     data = {
@@ -208,6 +214,7 @@ def test_get_unique_conversations_topics():
 
     assert conversation_topics_list == ["Recursion", "classes"]
 
+
 def test_count_conversations_by_topic():
     data = {
         "topics": [], 
@@ -247,6 +254,7 @@ def test_count_conversations_by_topic():
 
     assert result == {"recursion": 2, "classes": 1}
 
+
 def test_sorting_conversation_counts_descending():
     counts = {
         "classes": 1,
@@ -263,6 +271,9 @@ def test_sorting_conversation_counts_descending():
     ]
 
 
+def test_save_conversation():
+    data = {"topics": [], "conversations": []}
+    with patch("conversations.storage.save_data") as mock_save:
+        conversations.save_conversation(data)
 
-
-
+        mock_save.assert_called_once_with(data)

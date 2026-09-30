@@ -1,6 +1,5 @@
 import ai
 import ai_menu
-import storage
 import openai
 import httpx
 from unittest.mock import patch, call
@@ -15,7 +14,7 @@ def test_ai_api_error():
                     with patch("ai_menu.conversations.create_conversation", wraps=conversations.create_conversation) as mock_conversation:                     
                         with patch("ai_menu.conversations.add_message_to_conversation", wraps=conversations.add_message_to_conversation) as mock_message:
                             with patch("builtins.print") as mock_print:
-                                with patch("ai_menu.storage.save_topics") as mock_save:
+                                with patch("ai_menu.conversations.save_conversation") as mock_save:
                                     mock_input.side_effect = [
                                         "1",
                                         "1",
@@ -44,7 +43,7 @@ def test_ai_request_success_add_messages_to_conversation():
                 with patch("ai_menu.topics.get_notes") as mock_notes:
                     with patch("ai_menu.conversations.create_conversation") as mock_conversation:
                         with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
-                            with patch("ai_menu.storage.save_topics") as mock_save:
+                            with patch("ai_menu.conversations.save_conversation") as mock_save:
                                 mock_input.side_effect = [
                                                 "2",
                                                 "1",
@@ -87,7 +86,7 @@ def test_other_topic_option():
         with patch("builtins.input") as mock_input:
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.topics.get_notes") as mock_notes:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         with patch("ai_menu.topics.add_topic") as mock_add_topic:
                             mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
                             mock_input.side_effect = [
@@ -108,6 +107,34 @@ def test_other_topic_option():
                                 data["conversations"][0], [])
                             mock_add_topic.assert_called_once_with(data, "binary trees")
 
+def test_other_topic_option_case_insensitive():
+    data = {"topics": [],  "conversations": []}
+    with patch("ai_menu.topics.list_topics") as mock_list_topics:
+        with patch("builtins.input") as mock_input:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                with patch("ai_menu.topics.get_notes") as mock_notes:
+                    with patch("ai_menu.topics.add_topic") as mock_add_topic:
+                        with patch("ai_menu.conversations.create_conversation") as mock_create:
+                            with patch("ai_menu.conversations.save_conversation") as mock_save:
+                                mock_list_topics.return_value = ["Recursion", "Classes", "Algorithms"]
+                                mock_input.side_effect = [
+                                    "4",
+                                    "recursion",
+                                    "1",
+                                    "1",
+                                    "what is a base case?",
+                                    "/exit"
+                                ]
+
+                                mock_notes.return_value = []
+                                mock_ask.return_value = "A base case is a..."
+                                mock_add_topic.return_value = False
+
+                                ai_menu.manage_ai_menu(data)
+
+                                mock_create.assert_called_once_with(data, "Recursion", "Tutor")
+
+
 @pytest.mark.parametrize("edge_choice", ["0", "99"])
 def test_invalid_topic_input_edge_cases(edge_choice):
     data = {"topics": [],  "conversations": []}
@@ -115,7 +142,7 @@ def test_invalid_topic_input_edge_cases(edge_choice):
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
             with patch("ai_menu.topics.list_topics") as mock_list_topics:
                 with patch("builtins.print") as mock_print:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
 
                         ai_menu.manage_ai_menu(data)
@@ -124,18 +151,20 @@ def test_invalid_topic_input_edge_cases(edge_choice):
                         mock_ask.assert_not_called()
                         mock_save.assert_not_called()
 
+
 def test_ai_menu_create_conversation_success():
     data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("ai_menu.ai.ask_about_topic") as mock_ask:
             with patch("builtins.input", side_effect = ["2", "1", "2", "what is inheritance?", "/exit"]):
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
 
                         ai_menu.manage_ai_menu(data)
 
                         mock_conversation.assert_called_once_with(data, "classes", "Socratic tutor")
+
 
 def test_ai_menu_exit_from_ai_conversation():
     data = {"topics": [],  "conversations": []}
@@ -143,7 +172,7 @@ def test_ai_menu_exit_from_ai_conversation():
         with patch("builtins.input", side_effect = ["2", "2", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
 
                         ai_menu.manage_ai_menu(data)
@@ -152,13 +181,14 @@ def test_ai_menu_exit_from_ai_conversation():
                         mock_conversation.assert_not_called()
                         mock_save.assert_not_called()
 
+
 def test_ai_menu_continuing_conversation():
     data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input", side_effect = ["2", "1", "2", "What is inheritance?", "Can you give me an example?", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
                             mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
                             mock_ask.side_effect = ["Inheritance lets one class reuse another class",
@@ -176,6 +206,7 @@ def test_ai_menu_continuing_conversation():
                                                            call(mock_conversation.return_value, "assistant", "For example, Dog can inherit from Animal")])
                             mock_conversation.assert_called_once_with(data, "classes", "Socratic tutor")
                             assert mock_save.call_count == 2
+
 
 def test_choose_existing_conversation_to_continue():
     existing_conversation = {
@@ -197,7 +228,7 @@ def test_choose_existing_conversation_to_continue():
             with patch("ai_menu.conversations.get_conversations_by_topic") as mock_conversations_list:
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
                     with patch("ai_menu.ai.ask_about_topic") as mock_ask:
-                        with patch("ai_menu.storage.save_topics") as mock_save:
+                        with patch("ai_menu.conversations.save_conversation") as mock_save:
                             mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
                             mock_conversations_list.return_value = [existing_conversation]
                             mock_ask.return_value = "Without one the function will call itself forever causing the program to crash."
@@ -212,13 +243,14 @@ def test_choose_existing_conversation_to_continue():
                                                                              "content": "Without one the function will call itself forever causing the program to crash."}
                             mock_save.assert_called_once_with(data)
 
+
 def test_ai_menu_empty_question():
     data = {"topics": [],  "conversations": []}
     with patch("ai_menu.topics.list_topics") as mock_list_topics:
         with patch("builtins.input", side_effect = ["1", "1", "1", "  ", "/exit"]):
             with patch("ai_menu.ai.ask_about_topic") as mock_ask:
                 with patch("ai_menu.conversations.create_conversation") as mock_conversation:
-                    with patch("ai_menu.storage.save_topics") as mock_save:
+                    with patch("ai_menu.conversations.save_conversation") as mock_save:
                         with patch("ai_menu.conversations.add_message_to_conversation") as mock_message:
                             with patch("builtins.print") as mock_print:
                                 mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
@@ -229,13 +261,3 @@ def test_ai_menu_empty_question():
                                 mock_conversation.assert_not_called()
                                 mock_message.assert_not_called()
                                 mock_print.assert_any_call("Question cannot be empty, please try again.")
-
-
-
-
-
-
-
-
-
-

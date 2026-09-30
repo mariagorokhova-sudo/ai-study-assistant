@@ -7,6 +7,7 @@ The application is designed for first-year Computer Science students to help the
 2. Change a topic's status and add notes to a specific topic.
 3. Discuss questions with AI in 5 different learning modes.
 4. Save, browse, and continue previous AI conversations.
+5. Use up to 10 recent conversation messages and 10 recent topic notes as AI context.
 
 ## AI modes
 1. Tutor - immediately answers the question at a beginner level, gives a concrete example.
@@ -61,7 +62,7 @@ python -m pytest -v
 - `test_*.py` - automated tests for the application functionality.
 
 ## Data storage
-Application data is stored locally in `topics.json`. The file contains 2 main lists:
+Application data is stored locally in `data.json`. The file contains 2 main lists:
 ```json
 {
     "topics": [],

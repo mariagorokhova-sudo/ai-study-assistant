@@ -112,4 +112,3 @@ def manage_topics_menu(data):
 
         else:
             print("Invalid option!\n")
-

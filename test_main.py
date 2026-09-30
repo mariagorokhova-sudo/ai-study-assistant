@@ -11,6 +11,7 @@ def test_manage_topics_add_to_main_menu():
 
                 mock_topics_menu.assert_called_once_with(data)
 
+
 def test_main_json_file_damaged():
     with patch("main.topics.load_data") as mock_load:
         with patch("builtins.print") as mock_print:
@@ -19,30 +20,3 @@ def test_main_json_file_damaged():
             main.main()
 
             mock_print.assert_any_call("JSON file is corrupted and cannot be read.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-
-
-
-
-
-
-            
-

@@ -20,8 +20,8 @@ def ask_about_topic(conversation_entry, notes=None):
         input=conversation_entry["messages"][-10:]
     )
 
-
     return response.output_text
+
 
 def build_instructions(topic_name, ai_mode, notes=None):
     if ai_mode == "Socratic tutor":
@@ -74,6 +74,9 @@ def build_instructions(topic_name, ai_mode, notes=None):
         Adjust the difficulty of the next question based on the student's previous response.
         Keep questions and feedback appropriate for a first-year Computer Science student."""
 
+    else:
+        raise ValueError("Unknown AI mode")
+
     if notes:
         formatted_notes = "\n- ".join(notes[-10:])
         instructions+=f"""
@@ -81,4 +84,3 @@ def build_instructions(topic_name, ai_mode, notes=None):
         - {formatted_notes}"""
 
     return instructions
-

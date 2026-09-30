@@ -5,7 +5,7 @@ import pytest
 def test_add_topic():
     data = {"topics": []}
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         added, reason = topics.add_topic(data, "recursion")
 
         assert added is True
@@ -19,6 +19,7 @@ def test_add_topic():
         ]
         mock_save.assert_called_once_with(data)
 
+
 def test_add_duplicate_topic():
     data = {
         "topics": [
@@ -30,7 +31,7 @@ def test_add_duplicate_topic():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         added, reason = topics.add_topic(data, "recursion")
 
         assert added is False
@@ -46,6 +47,7 @@ def test_add_duplicate_topic():
                 }
         mock_save.assert_not_called()
 
+
 def test_add_duplicate_topic_different_case():
     data = {
         "topics": [
@@ -57,7 +59,7 @@ def test_add_duplicate_topic_different_case():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         added, reason = topics.add_topic(data, "Classes")
 
         assert added is False
@@ -73,6 +75,7 @@ def test_add_duplicate_topic_different_case():
                 }
         mock_save.assert_not_called()
 
+
 def test_add_empty_topic():
     data = {
         "topics": [
@@ -84,7 +87,7 @@ def test_add_empty_topic():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         added, reason = topics.add_topic(data, "   ")
 
         assert added is False
@@ -118,7 +121,7 @@ def test_delete_topic():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         deleted, reason = topics.delete_topic(data, "Recursion")
 
         assert deleted is True
@@ -134,6 +137,7 @@ def test_delete_topic():
         }
         mock_save.assert_called_once_with(data)
 
+
 def test_delete_topic_not_found():
     data = {
         "topics": [
@@ -145,7 +149,7 @@ def test_delete_topic_not_found():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         deleted, reason = topics.delete_topic(data, "recursion")
 
         assert deleted is False
@@ -161,6 +165,7 @@ def test_delete_topic_not_found():
         }
         mock_save.assert_not_called()
 
+
 def test_delete_empty_topic():
     data = {
         "topics": [
@@ -172,7 +177,7 @@ def test_delete_empty_topic():
         ]
     }
 
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         deleted, reason = topics.delete_topic(data, "  ")
 
         assert deleted is False
@@ -191,7 +196,7 @@ def test_delete_empty_topic():
 
 
 def test_change_topic_status():
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         data = {
             "topics": [
                 {
@@ -217,12 +222,13 @@ def test_change_topic_status():
        
         mock_save.assert_called_once_with(data)
 
+
 @pytest.mark.parametrize(
     "topic_name, new_status, reason", 
     [("recursion", "banana", "invalid status"), 
     ("graphs", "in progress", "topic not found")])
 def test_change_topic_status_invalid_input(topic_name, new_status, reason):
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         data = {
             "topics": [
                 {
@@ -246,8 +252,9 @@ def test_change_topic_status_invalid_input(topic_name, new_status, reason):
         ]
         mock_save.assert_not_called()
 
+
 def test_add_note_to_existing_notes():
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         data = {
                 "topics": [
                     {
@@ -274,12 +281,13 @@ def test_add_note_to_existing_notes():
                 ]
         mock_save.assert_called_once_with(data)
 
+
 @pytest.mark.parametrize("topic_name, new_note, reason", 
                         [("functions", "note about function", "topic not found"),
                         ("recursion", "", "empty note"),
                         (("recursion", "  ", "empty note"))])
 def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
-    with patch("topics.storage.save_topics") as mock_save:
+    with patch("topics.storage.save_data") as mock_save:
         data = {
             "topics": [
                 {
@@ -302,6 +310,7 @@ def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
         ]
         mock_save.assert_not_called()
 
+
 def test_topics_get_notes_for_existing_topic():
     data = {
         "topics": [
@@ -321,6 +330,7 @@ def test_topics_get_notes_for_existing_topic():
             "You need a base case so that a function knows where to stop"
             ]
 
+
 def test_topics_get_notes_for_existing_topic_empty_notes():
     data = {
         "topics": [
@@ -337,6 +347,7 @@ def test_topics_get_notes_for_existing_topic_empty_notes():
 
     assert result == []
 
+
 def test_topics_get_notes_for_nonexisting_topic():
     data = {
         "topics": [
@@ -352,19 +363,3 @@ def test_topics_get_notes_for_nonexisting_topic():
     result = topics.get_notes(data, "classes")
 
     assert result is None
-
-
-
-
-
-
-           
-
-
-
-
-
-
-
-
-

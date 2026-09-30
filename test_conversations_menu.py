@@ -7,12 +7,14 @@ def test_conversations_menu_back_option():
     with patch("builtins.input", side_effect=["4"]):
         conversations_menu.manage_conversations_menu(data)
 
+
 def test_view_history_invalid_input():
     data = {"topics": [],  "conversations": []}
     with patch("builtins.input", side_effect = ["1", "7", "4"]):
         with patch("builtins.print") as mock_print:
             conversations_menu.manage_conversations_menu(data)
             mock_print.assert_any_call("Invalid option!\n")
+
 
 @pytest.mark.parametrize("wrong_choice", ["abc", "0", "99"])
 def test_view_history_by_topic_wrong_topic_choice(wrong_choice):
@@ -37,6 +39,7 @@ def test_view_history_by_topic_wrong_topic_choice(wrong_choice):
             conversations_menu.manage_conversations_menu(data)
 
             mock_conversations.assert_not_called()
+
 
 def test_conversations_menu_print_numbered_conversations():
     data = {
@@ -66,6 +69,7 @@ def test_conversations_menu_print_numbered_conversations():
 
             mock_numbered_print.assert_called_once_with(data["conversations"], include_new_option=False)
 
+
 def test_conversations_menu_print_conversations_topics_list_empty_list():
     data = {
         "topics": [],
@@ -80,6 +84,7 @@ def test_conversations_menu_print_conversations_topics_list_empty_list():
                 conversations_menu.manage_conversations_menu(data)
 
                 mock_print.assert_any_call("No conversations yet!\n")
+
 
 def test_conversations_menu_view_history_on_specific_topic():
     data = {
@@ -105,6 +110,7 @@ def test_conversations_menu_view_history_on_specific_topic():
             conversations_menu.manage_conversations_menu(data)
 
             mock_print_all_messages.assert_called_once_with(data["conversations"][0])
+
 
 def test_conversations_menu_view_conversations_counts():
     data = {
@@ -158,6 +164,7 @@ def test_conversations_menu_view_conversations_counts():
                     mock_sort.assert_called_once_with(mock_count.return_value)
                     mock_print.assert_has_calls([call("recursion: 2"), call("classes: 1")])
 
+
 def test_conversations_menu_view_conversations_counts_empty_conversations():
     data = {
         "topics": [], 
@@ -174,18 +181,3 @@ def test_conversations_menu_view_conversations_counts_empty_conversations():
 
                     mock_print.assert_any_call("No conversations yet!\n")
                     mock_sort.assert_not_called()
-
-
-
-    
-
-
-
-        
-
-
-
-
-
-
-

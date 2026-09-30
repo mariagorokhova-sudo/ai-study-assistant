@@ -35,6 +35,7 @@ def test_build_instructions_socratic():
     assert topic_name in instructions
     assert "Do not give the final answer immediately" in instructions
 
+
 def test_build_instructions_tutor():
     topic_name = "Recursion"
     ai_mode = "Tutor"
@@ -45,6 +46,7 @@ def test_build_instructions_tutor():
     assert "Explain concepts at a beginner level" in instructions
     assert "include one concrete example" in instructions
 
+
 def test_build_instructions_debugger():
     topic_name = "Recursion"
     ai_mode = "Debugger"
@@ -54,6 +56,7 @@ def test_build_instructions_debugger():
     assert topic_name in instructions
     assert "Do not provide the corrected code immediately" in instructions
     assert "Ask one focused debugging question at a time" in instructions
+
 
 def test_build_instructions_code_reviewer():
     topic_name = "Recursion"
@@ -70,6 +73,7 @@ def test_build_instructions_code_reviewer():
     assert "Separate required fixes from optional improvements" in instructions
     assert "Let the student decide which optional improvements to implement" in instructions
 
+
 def test_build_instructions_examiner():
     topic_name = "Recursion"
     ai_mode = "Examiner"
@@ -80,6 +84,7 @@ def test_build_instructions_examiner():
     assert "Ask one question at a time" in instructions
     assert " Mix open-ended and multiple-choice questions" in instructions
     assert "Do not reveal the correct answer before the student responds" in instructions
+
 
 def test_build_instructions_include_notes():
     topic_name = "Recursion"
@@ -94,6 +99,7 @@ def test_build_instructions_include_notes():
     assert "- Note 2\n" in instructions
     assert "- Note 11" in instructions
 
+
 def test_open_api_key_does_not_exist(monkeypatch):
     conversation_entry = {
             "topic": "Recursion",
@@ -105,4 +111,6 @@ def test_open_api_key_does_not_exist(monkeypatch):
         ai.ask_about_topic(conversation_entry, None)
 
 
-
+def test_unknown_ai_mode():
+    with pytest.raises(ValueError):
+        ai.build_instructions("Recursion", "Unknown mode")

@@ -22,6 +22,7 @@ def test_delete_topic_option_wrong_choice():
 
                 mock_delete.assert_not_called()
 
+
 def test_delete_topic_option_success():
     data = {
         "topics":[
@@ -44,6 +45,7 @@ def test_delete_topic_option_success():
                         mock_delete.assert_called_once_with(data, "recursion")
                         mock_print.assert_any_call("Topic deleted!")
                         assert mock_print_numbered_topics.call_count == 3
+
 
 def test_change_topic_status_success():
     data = {
@@ -92,6 +94,7 @@ def test_change_topic_status_unsuccessful():
                     mock_change_status.assert_called_once_with(data, "recursion", "in progress")
                     mock_print.assert_any_call("Invalid status!\n")
 
+
 def test_topics_menu_add_new_note():
     data = {
         "topics":[
@@ -117,6 +120,7 @@ def test_topics_menu_add_new_note():
 
                 mock_add_note.assert_called_once_with(data, "binary trees", "Tree has a root node")
 
+
 def test_topics_menu_add_new_note_empty_list():
     data = {"topics":[], "conversations": []}
     with patch("builtins.input", side_effect = ["5", "6"]):
@@ -127,6 +131,7 @@ def test_topics_menu_add_new_note_empty_list():
                 topics_menu.manage_topics_menu(data)
 
                 mock_add_note.assert_not_called()
+
 
 def test_topic_menu_get_topics_with_details():
     data = {
@@ -150,7 +155,3 @@ def test_topic_menu_get_topics_with_details():
             topics_menu.manage_topics_menu(data)
 
             mock_print_numbered_topics.assert_called_once_with(data)
-
-            
-
-

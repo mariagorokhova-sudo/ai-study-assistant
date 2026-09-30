@@ -11,6 +11,7 @@ def test_print_numbered_list():
         mock_print.assert_any_call("1. Recursion")
         mock_print.assert_any_call("2. Classes")
 
+
 def test_choose_from_numbered_list():
     topic_names_list = ["Recursion", "Classes"]
     with patch("builtins.input", side_effect=["2"]):
@@ -28,6 +29,7 @@ def test_choose_from_numbered_list_wrong_input(wrong_input):
 
             mock_print.assert_any_call("Invalid option!\n")
 
+
 def test_choose_from_numbered_list_empty_list():
     topic_names_list = []
     with patch("builtins.print") as mock_print:
@@ -35,6 +37,7 @@ def test_choose_from_numbered_list_empty_list():
 
         assert result is None
         mock_print.assert_any_call("No options yet!\n")
+
 
 def test_print_numbered_topics_with_details():
     data = {
@@ -64,6 +67,7 @@ def test_print_numbered_topics_with_details():
         mock_print.assert_any_call("Status: new")
         mock_print.assert_any_call("Notes: no notes yet!\n")
 
+
 def test_print_numbered_conversations():
     conversations_list = [{
         "topic": "recursion", 
@@ -81,12 +85,14 @@ def test_print_numbered_conversations():
         mock_print.assert_any_call("1. Topic: recursion | AI mode: Socratic tutor | Last question: What is recursion?")
         mock_print.assert_any_call("2. Start new conversation\n")
 
+
 def test_print_numbered_conversations_empty_list():
     conversations_list = []
     with patch("builtins.print") as mock_print:
         menu_utils.print_numbered_conversations(conversations_list)
 
         mock_print.assert_any_call("No conversations yet!\n")
+
 
 def test_print_all_conversation_messages():
     conversation_entry = {
@@ -111,6 +117,7 @@ def test_print_all_conversation_messages():
         mock_print.assert_any_call("User: What is recursion?")
         mock_print.assert_any_call("Assistant: It's when a function calls itself.")
 
+
 def test_choose_from_numbered_list_without_other_option():
     options_list = [
         {
@@ -134,19 +141,11 @@ def test_choose_from_numbered_list_without_other_option():
 
        assert result == options_list[0]
 
+
 def test_adding_custom_propmt_to_choose_from_numbered_list():
     topic_list = ["recursion", "classes"]
     with patch("builtins.input", return_value="1") as mock_input:
         result = menu_utils.choose_from_numbered_list(topic_list, prompt="Please choose a topic: ")
 
         mock_input.assert_called_once_with("Please choose a topic: ")
-        assert result == "recursion" 
-
-
-    
-
-
-
-
-
-
+        assert result == "recursion"

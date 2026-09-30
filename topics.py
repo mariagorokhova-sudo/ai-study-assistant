@@ -1,8 +1,8 @@
 import storage
 
-
 def load_data():
-    return storage.load_topics()
+    return storage.load_data()
+
 
 def add_topic(data, name):
     name = name.strip()
@@ -18,14 +18,16 @@ def add_topic(data, name):
             return False, "duplicate"
 
     data["topics"].append(new_topic)
-    storage.save_topics(data)
+    storage.save_data(data)
     return True, "added"
+
 
 def list_topics(data):
     topic_names = []
     for topic in data["topics"]:
         topic_names.append(topic["name"])
     return topic_names
+
 
 def delete_topic(data, name):
     name = name.strip()
@@ -34,9 +36,10 @@ def delete_topic(data, name):
     for topic in data["topics"]:
         if topic["name"].lower() == name.lower():
             data["topics"].remove(topic)
-            storage.save_topics(data)
+            storage.save_data(data)
             return True, "deleted"
     return False, "not found"
+
 
 def change_topic_status(data, topic_name, new_status):
     new_status = new_status.strip().lower()
@@ -46,9 +49,10 @@ def change_topic_status(data, topic_name, new_status):
     for entry in data["topics"]:
         if entry["name"].lower() == topic_name.lower():
             entry["status"] = new_status
-            storage.save_topics(data)
+            storage.save_data(data)
             return True, "changed"
     return False, "topic not found"
+
 
 def add_note(data, topic_name, new_note):
     if not new_note.strip():
@@ -56,12 +60,12 @@ def add_note(data, topic_name, new_note):
     for entry in data["topics"]:
         if topic_name.lower() == entry["name"].lower():
             entry["notes"].append(new_note.strip())
-            storage.save_topics(data)
+            storage.save_data(data)
             return True, "added"
     return False, "topic not found"
+
 
 def get_notes(data, topic_name):
     for entry in data["topics"]:
         if topic_name.lower() == entry["name"].lower():
             return entry["notes"]
-

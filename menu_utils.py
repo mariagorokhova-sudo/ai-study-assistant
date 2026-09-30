@@ -9,6 +9,7 @@ def print_numbered_list(options_list, include_other_option=False):
     else:
         print("\n")
 
+
 def choose_from_numbered_list(options_list, include_other_option=False, prompt="Please choose an option from the list above: "):
     if not options_list and not include_other_option:
         print("No options yet!\n")
@@ -29,6 +30,7 @@ def choose_from_numbered_list(options_list, include_other_option=False, prompt="
     else:
         return options_list[user_choice-1]
 
+
 def print_numbered_topics_with_details(data):
     print("\n===================================================================================")
     print("Current list of topics with details:")
@@ -45,6 +47,7 @@ def print_numbered_topics_with_details(data):
             for note in topic_details["notes"]:
                 print(f'- {note}')
             print("-----------------------------------------------------------------------------------")
+
 
 def print_numbered_conversations(conversations_list, include_new_option=True):
     if not conversations_list:
@@ -64,6 +67,7 @@ def print_numbered_conversations(conversations_list, include_new_option=True):
         print("============================== or you can =========================================\n")
         print(f'{last_option}. Start new conversation\n')
 
+
 def print_all_conversation_messages(conversation_entry):
     print("\n===================================================================================")
     print(f'AI mode: {conversation_entry["ai_mode"]}')
@@ -71,8 +75,3 @@ def print_all_conversation_messages(conversation_entry):
     for entry in conversation_entry["messages"]:
         print(f'{entry["role"].capitalize()}: {entry["content"]}')
         print("-----------------------------------------------------------------------------------\n")
-
-
-
-
-
