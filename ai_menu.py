@@ -23,6 +23,7 @@ def manage_ai_menu(data):
         topics.add_topic(data, topic_name)
     print(f"\nYou've chosen {topic_name}.")
 
+    topic_notes = topics.get_notes(data, topic_name)
     conversations_list = conversations.get_conversations_by_topic(data, topic_name)
     menu_utils.print_numbered_conversations(conversations_list)
     conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=True, prompt="Please choose an option to continue or start a new conversation: ")
@@ -48,19 +49,23 @@ def manage_ai_menu(data):
         if not question:
             print("Question cannot be empty, please try again.")
             continue
-        
-        if conversation_entry == "new":
+
+        conversation_is_new = conversation_entry == "new"
+        if conversation_is_new:
             conversation_entry = conversations.create_conversation(data, topic_name, ai_mode)
 
         conversations.add_message_to_conversation(conversation_entry, "user", question)
         
         try:
-            answer = ai.ask_about_topic(conversation_entry)
+            answer = ai.ask_about_topic(conversation_entry, topic_notes)
             print("\n-----------------------------------------------------------------------------------")
             print(f"\n{answer}")
             conversations.add_message_to_conversation(conversation_entry, "assistant", answer)
         except openai.APIError as error:
             conversation_entry["messages"].pop()
+            if conversation_is_new:
+                data["conversations"].remove(conversation_entry)
+                conversation_entry = "new"
             print("Sorry, the AI request failed. Please try again.")
             print(error)
         storage.save_topics(data)

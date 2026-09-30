@@ -302,6 +302,57 @@ def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
         ]
         mock_save.assert_not_called()
 
+def test_topics_get_notes_for_existing_topic():
+    data = {
+        "topics": [
+            {"name": "Recursion",
+            "status": "in progress",
+            "notes": [
+                "Recursion is when a function calls itself.",
+                "You need a base case so that a function knows where to stop"
+            ]}
+        ],
+        "conversations": []
+    }
+    result = topics.get_notes(data, "recursion")
+
+    assert result == [
+            "Recursion is when a function calls itself.",
+            "You need a base case so that a function knows where to stop"
+            ]
+
+def test_topics_get_notes_for_existing_topic_empty_notes():
+    data = {
+        "topics": [
+            {
+                "name": "Recursion",
+                "status": "in progress",
+                "notes": []
+            }
+        ],
+        "conversations": []
+    }
+
+    result = topics.get_notes(data, "recursion")
+
+    assert result == []
+
+def test_topics_get_notes_for_nonexisting_topic():
+    data = {
+        "topics": [
+            {"name": "Recursion",
+            "status": "in progress",
+            "notes": [
+                "Recursion is when a function calls itself.",
+                "You need a base case so that a function knows where to stop"
+            ]}
+        ],
+        "conversations": []
+    }
+    result = topics.get_notes(data, "classes")
+
+    assert result is None
+
 
 
 

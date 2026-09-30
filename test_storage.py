@@ -38,7 +38,150 @@ def test_load_topics_when_file_does_not_exist(tmp_path, monkeypatch):
                          [
                             {"topics": "", "conversations":[]},
                             {"topics": [], "conversations": ""},
-                            []
+                            [],
+                            {"topics": ["recursion"], "conversations": []},
+                            {
+                                "topics": [
+                                    {
+                                        "status": "new",
+                                        "notes": []
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [
+                                    {
+                                        "name": 123,
+                                        "status": "new",
+                                        "notes": []
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [
+                                    {
+                                        "name": "Recursion",
+                                        "status": 123,
+                                        "notes": ["A note"]
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [
+                                    {
+                                        "name": "Recursion",
+                                        "status": "new",
+                                        "notes": "A note"
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [
+                                    {
+                                        "name": "Recursion",
+                                        "status": "new",
+                                        "notes": ["A note", 123]
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [],
+                                "conversations": ["broken conversation"]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor"
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": 123,
+                                        "ai_mode": "Tutor",
+                                        "messages": []
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": 123,
+                                        "messages": []
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor",
+                                        "messages": "Not a list"
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor",
+                                        "messages": ["Broken message"]
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor",
+                                        "messages": [{}]
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor",
+                                        "messages": [
+                                            {
+                                                "role": 123,
+                                                "content": "What is recursion?"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "topics": [],
+                                "conversations": [
+                                    {
+                                        "topic": "Recursion",
+                                        "ai_mode": "Tutor",
+                                        "messages": [
+                                            {
+                                                "role": "user",
+                                                "content": 123
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
                          ])
 def test_load_topics_invalid_structure(tmp_path, monkeypatch, data):
     test_file = tmp_path/"test_topics.json"

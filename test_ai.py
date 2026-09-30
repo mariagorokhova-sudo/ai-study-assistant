@@ -1,23 +1,29 @@
 import ai
 from unittest.mock import patch
+import pytest
 
 def test_ask_about_topic():
     conversation_entry = {
             "topic": "Recursion",
             "ai_mode": "Tutor",
-            "messages": [{"role": "user", "content": "What is a base case?"}]
+            "messages": []
         }
+    notes = ["note 1"]
+    for i in range(1, 12, 2):
+        conversation_entry["messages"].append({"role": "user", "content": f'message {i}'})
+        conversation_entry["messages"].append({"role": "assistant", "content": f'message {i+1}'})
     
-    with patch.object(ai.client.responses, "create") as mock_create:
+    with patch("ai.OpenAI") as mock_openai:
+        mock_create = mock_openai.return_value.responses.create
         mock_create.return_value.output_text = "This is a test answer"
-        answer = ai.ask_about_topic(conversation_entry)
+        answer = ai.ask_about_topic(conversation_entry, notes)
         expected_instructions = ai.build_instructions(conversation_entry["topic"], 
-                                                      conversation_entry["ai_mode"])
+                                                      conversation_entry["ai_mode"], notes)
         
         assert answer == "This is a test answer"
         mock_create.assert_called_once_with(model="gpt-5.6-luna", 
                                             instructions=expected_instructions, 
-                                            input=conversation_entry["messages"])
+                                            input=conversation_entry["messages"][-10:])
 
 
 def test_build_instructions_socratic():
@@ -74,4 +80,29 @@ def test_build_instructions_examiner():
     assert "Ask one question at a time" in instructions
     assert " Mix open-ended and multiple-choice questions" in instructions
     assert "Do not reveal the correct answer before the student responds" in instructions
+
+def test_build_instructions_include_notes():
+    topic_name = "Recursion"
+    ai_mode = "Examiner"
+    notes = []
+    for i in range(1,12):
+        notes.append(f'Note {i}')
+    
+    instructions = ai.build_instructions(topic_name, ai_mode, notes=notes)
+
+    assert "- Note 1\n" not in instructions
+    assert "- Note 2\n" in instructions
+    assert "- Note 11" in instructions
+
+def test_open_api_key_does_not_exist(monkeypatch):
+    conversation_entry = {
+            "topic": "Recursion",
+            "ai_mode": "Tutor",
+            "messages": []
+        }
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with pytest.raises(ValueError, match="OPENAI_API_KEY is missing"):
+        ai.ask_about_topic(conversation_entry, None)
+
+
 

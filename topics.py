@@ -59,3 +59,9 @@ def add_note(data, topic_name, new_note):
             storage.save_topics(data)
             return True, "added"
     return False, "topic not found"
+
+def get_notes(data, topic_name):
+    for entry in data["topics"]:
+        if topic_name.lower() == entry["name"].lower():
+            return entry["notes"]
+

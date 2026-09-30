@@ -4,26 +4,26 @@ from openai import OpenAI
 
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY is missing")
+def ask_about_topic(conversation_entry, notes=None):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is missing")
 
-client = OpenAI(api_key=api_key)
+    client = OpenAI(api_key=api_key)
 
-def ask_about_topic(conversation_entry):
     instructions = build_instructions(conversation_entry["topic"], 
-                                      conversation_entry["ai_mode"])
+                                      conversation_entry["ai_mode"], notes)
    
     response = client.responses.create(
         model="gpt-5.6-luna",
         instructions=instructions, 
-        input=conversation_entry["messages"]
+        input=conversation_entry["messages"][-10:]
     )
 
 
     return response.output_text
 
-def build_instructions(topic_name, ai_mode):
+def build_instructions(topic_name, ai_mode, notes=None):
     if ai_mode == "Socratic tutor":
         instructions = f"""
         You are a Socratic tutor helping a first-year Computer Science student learn: {topic_name}.
@@ -73,6 +73,12 @@ def build_instructions(topic_name, ai_mode):
         Briefly explain any mistakes or missing points before asking the next question.
         Adjust the difficulty of the next question based on the student's previous response.
         Keep questions and feedback appropriate for a first-year Computer Science student."""
+
+    if notes:
+        formatted_notes = "\n- ".join(notes[-10:])
+        instructions+=f"""
+        \nStudent's notes:
+        - {formatted_notes}"""
 
     return instructions
 
