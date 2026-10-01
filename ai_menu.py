@@ -19,7 +19,7 @@ def manage_ai_menu(data):
         if not topic_name:
             print("Topic name cannot be empty!\n")
             return
-        topic_added = topics.add_topic(data, topic_name)
+        topic_added, reason = topics.add_topic(data, topic_name)
         if not topic_added:
             topic_name = conversations.find_matching_topic_case_insensitive(topic_name, topics_list)
     print(f"\nYou've chosen {topic_name}.")
@@ -69,4 +69,13 @@ def manage_ai_menu(data):
                 conversation_entry = "new"
             print("Sorry, the AI request failed. Please try again.")
             print(error)
+        except ValueError as error:
+            if str(error) != "OPENAI_API_KEY is missing":
+                raise
+            conversation_entry["messages"].pop()
+            if conversation_is_new:
+                data["conversations"].remove(conversation_entry)
+                conversation_entry = "new"
+            print("OPENAI_API_KEY is missing. Please add it to the .env file.")
+            return
         conversations.save_conversation(data)

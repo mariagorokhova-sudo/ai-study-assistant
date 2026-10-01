@@ -10,7 +10,7 @@ def print_numbered_list(options_list, include_other_option=False):
         print("\n")
 
 
-def choose_from_numbered_list(options_list, include_other_option=False, prompt="Please choose an option from the list above: "):
+def choose_from_numbered_list(options_list, include_other_option=False, prompt="Please choose an option from the list above: ", return_index=False):
     if not options_list and not include_other_option:
         print("No options yet!\n")
         return
@@ -28,6 +28,8 @@ def choose_from_numbered_list(options_list, include_other_option=False, prompt="
     elif include_other_option and user_choice == last_option:
         return "new"
     else:
+        if return_index:
+            return user_choice - 1
         return options_list[user_choice-1]
 
 
@@ -56,7 +58,7 @@ def print_numbered_conversations(conversations_list, include_new_option=True):
             print("1. Start new conversation\n")
         return
     print("\n===================================================================================")
-    print("List of previous conversations:")
+    print("Current list of conversations:")
     print("===================================================================================\n")
     for number, conversation in enumerate(conversations_list, start=1):
         last_user_message = conversations.get_last_user_message(conversation)

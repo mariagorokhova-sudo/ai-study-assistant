@@ -56,3 +56,11 @@ def sort_conversations_counts_descending(counts):
 
 def save_conversation(data):
     storage.save_data(data)
+
+
+def delete_conversation(data, conversation_index):
+    if conversation_index < 0 or conversation_index >= len(data["conversations"]):
+        return False, "incorrect index"
+    data["conversations"].pop(conversation_index)
+    storage.save_data(data)
+    return True, "deleted"

@@ -1,5 +1,6 @@
 import conversations
 from unittest.mock import patch
+import pytest
 
 def test_create_conversation():
     data = {"topics": [],  "conversations": []}
@@ -277,3 +278,106 @@ def test_save_conversation():
         conversations.save_conversation(data)
 
         mock_save.assert_called_once_with(data)
+
+
+def test_delete_conversation():
+    data = {
+        "topics": [],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            },
+            {
+            "topic": "Recursion",
+            "ai_mode": "Debugger",
+            "messages": [
+                {"role": "user",
+                "content": "Question on debugging?"},
+                {"role": "assistant",
+                "content": "Answer on debugging"}]
+            }
+        ]
+    }
+    with patch("conversations.storage.save_data") as mock_save:
+        result, reason = conversations.delete_conversation(data, 0)
+
+        assert data == {
+            "topics": [],
+            "conversations": [
+                {
+                    "topic": "Recursion",
+                    "ai_mode": "Debugger",
+                    "messages": [
+                        {"role": "user",
+                        "content": "Question on debugging?"},
+                        {"role": "assistant",
+                        "content": "Answer on debugging"}
+                    ]
+                }
+            ]
+        }
+        mock_save.assert_called_once_with(data)
+        assert result is True
+        assert reason == "deleted"
+
+
+@pytest.mark.parametrize("incorrect_index", [-1, 2])
+def test_delete_conversation_incorrect_index(incorrect_index):
+    data = {
+        "topics": [],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            },
+            {
+            "topic": "Recursion",
+            "ai_mode": "Debugger",
+            "messages": [
+                {"role": "user",
+                "content": "Question on debugging?"},
+                {"role": "assistant",
+                "content": "Answer on debugging"}]
+            }
+        ]
+    }
+    with patch("conversations.storage.save_data") as mock_save:
+        result, reason = conversations.delete_conversation(data, incorrect_index)
+
+        assert data == {
+            "topics": [],
+            "conversations": [
+                {
+                "topic": "Recursion",
+                "ai_mode": "Socratic tutor",
+                "messages": [
+                    {"role": "user",
+                    "content": "What is recursion?"},
+                    {"role": "assistant",
+                    "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+                },
+                {
+                "topic": "Recursion",
+                "ai_mode": "Debugger",
+                "messages": [
+                    {"role": "user",
+                    "content": "Question on debugging?"},
+                    {"role": "assistant",
+                    "content": "Answer on debugging"}]
+                }
+            ]
+        }
+        assert result is False
+        assert reason == "incorrect index"
+        mock_save.assert_not_called()

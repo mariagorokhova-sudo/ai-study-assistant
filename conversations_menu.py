@@ -8,7 +8,8 @@ def manage_conversations_menu(data):
         print("1. View all conversations")
         print("2. View conversations on specific topic")
         print("3. View conversations counts by topic")
-        print("4. Back\n")
+        print("4. Delete a conversation")
+        print("5. Back\n")
         print("===================================================================================\n")
 
         choice_history = input("Please choose an option: ").strip()
@@ -48,8 +49,26 @@ def manage_conversations_menu(data):
             print("==================================================================================\n")
             for topic, count in counts_sorted:
                 print(f"{topic}: {count}")
-        
+
         elif choice_history == "4":
+            print("You've chosen to delete a conversation.")
+            menu_utils.print_numbered_conversations(data["conversations"], include_new_option=False)
+            if not data["conversations"]:
+                continue
+            conversation_index = menu_utils.choose_from_numbered_list(data["conversations"],
+                                                                      prompt="Please choose a conversation to delete: ",
+                                                                      include_other_option=False,
+                                                                      return_index=True)
+            if conversation_index is None:
+                continue
+            deleted, reason = conversations.delete_conversation(data, conversation_index)
+            if deleted:
+                print("Conversation deleted!\n")
+                menu_utils.print_numbered_conversations(data["conversations"], include_new_option=False)
+            elif reason == "incorrect index":
+                print("Impossible to delete, conversation index is incorrect.\n")
+
+        elif choice_history == "5":
             break
 
         else:

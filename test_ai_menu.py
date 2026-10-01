@@ -35,6 +35,54 @@ def test_ai_api_error():
                                     assert created_conversation["messages"] == []
                                     assert data["conversations"] == []
 
+
+def test_missing_api_key_returns_to_main_menu():
+    data = {"topics": [],  "conversations": []}
+    with patch("builtins.input") as mock_input:
+        with patch("ai_menu.topics.list_topics") as mock_list_topics:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                    with patch("ai_menu.conversations.create_conversation", wraps=conversations.create_conversation) as mock_conversation:
+                        with patch("ai_menu.conversations.add_message_to_conversation", wraps=conversations.add_message_to_conversation) as mock_message:
+                            with patch("builtins.print") as mock_print:
+                                with patch("ai_menu.conversations.save_conversation") as mock_save:
+                                    mock_input.side_effect = [
+                                        "1",
+                                        "1",
+                                        "1",
+                                        "what is recursion?"
+                                    ]
+                                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                                    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                                    mock_ask.side_effect = ValueError("OPENAI_API_KEY is missing")
+
+                                    ai_menu.manage_ai_menu(data)
+                                    created_conversation = mock_message.call_args.args[0]
+
+                                    mock_print.assert_any_call("OPENAI_API_KEY is missing. Please add it to the .env file.")
+                                    mock_message.assert_called_once_with(created_conversation, "user", "what is recursion?")
+                                    mock_save.assert_not_called()
+                                    assert created_conversation["messages"] == []
+                                    assert data["conversations"] == []
+
+
+def test_unexpected_value_error_is_raised():
+    data = {"topics": [],  "conversations": []}
+    with patch("builtins.input") as mock_input:
+        with patch("ai_menu.topics.list_topics") as mock_list_topics:
+            with patch("ai_menu.ai.ask_about_topic") as mock_ask:
+                mock_input.side_effect = [
+                    "1",
+                    "1",
+                    "1",
+                    "what is recursion?"
+                ]
+                mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                mock_ask.side_effect = ValueError("Unexpected error")
+
+                with pytest.raises(ValueError, match="Unexpected error"):
+                    ai_menu.manage_ai_menu(data)
+
+
 def test_ai_request_success_add_messages_to_conversation():
     data = {"topics": [],  "conversations": []}
     with patch("builtins.input") as mock_input:
@@ -100,6 +148,7 @@ def test_other_topic_option():
 
                             mock_notes.return_value = []
                             mock_ask.return_value = "A binary tree is a ..."
+                            mock_add_topic.return_value = (True, "added")
 
                             ai_menu.manage_ai_menu(data)
 
@@ -128,7 +177,7 @@ def test_other_topic_option_case_insensitive():
 
                                 mock_notes.return_value = []
                                 mock_ask.return_value = "A base case is a..."
-                                mock_add_topic.return_value = False
+                                mock_add_topic.return_value = (False, "duplicate")
 
                                 ai_menu.manage_ai_menu(data)
 

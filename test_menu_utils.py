@@ -149,3 +149,11 @@ def test_adding_custom_propmt_to_choose_from_numbered_list():
 
         mock_input.assert_called_once_with("Please choose a topic: ")
         assert result == "recursion"
+
+
+def test_menu_utils_return_index_from_numbered_list():
+    notes_list = ["first note", "second note"]
+    with patch("builtins.input", return_value="2") as mock_input:
+        result = menu_utils.choose_from_numbered_list(notes_list, return_index=True)
+
+        assert result == 1

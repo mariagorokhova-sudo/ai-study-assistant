@@ -363,3 +363,91 @@ def test_topics_get_notes_for_nonexisting_topic():
     result = topics.get_notes(data, "classes")
 
     assert result is None
+
+
+def test_delete_note():
+    data = {
+        "topics": [
+            {
+                "name": "Recursion",
+                "status": "in progress",
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": []
+    }
+    with patch("topics.storage.save_data") as mock_save:
+        result, reason = topics.delete_note(data, "Recursion", 0)
+
+        assert data == {
+            "topics": [
+                {
+                    "name": "Recursion",
+                    "status": "in progress",
+                    "notes": ["recursive case"]
+                }
+            ],
+            "conversations": []
+        }
+        mock_save.assert_called_once_with(data)
+        assert result == True
+        assert reason == "deleted"
+
+
+@pytest.mark.parametrize("incorrect_index", [2, -1])
+def test_delete_note_incorrect_index(incorrect_index):
+    data = {
+        "topics": [
+            {
+                "name": "Recursion",
+                "status": "in progress",
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": []
+    }
+    with patch("topics.storage.save_data") as mock_save:
+        result, reason = topics.delete_note(data, "Recursion", incorrect_index)
+
+        assert data == {
+            "topics": [
+                {
+                    "name": "Recursion",
+                    "status": "in progress",
+                    "notes": ["base case", "recursive case"]
+                }
+            ],
+            "conversations": []
+        }
+        mock_save.assert_not_called()
+        assert result == False
+        assert reason == "incorrect index"
+
+
+def test_delete_note_topic_not_found():
+    data = {
+        "topics": [
+            {
+                "name": "Recursion",
+                "status": "in progress",
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": []
+    }
+    with patch("topics.storage.save_data") as mock_save:
+        result, reason = topics.delete_note(data, "Classes", 0)
+
+        assert data == {
+            "topics": [
+                {
+                    "name": "Recursion",
+                    "status": "in progress",
+                    "notes": ["base case", "recursive case"]
+                }
+            ],
+            "conversations": []
+        }
+        mock_save.assert_not_called()
+        assert result is False
+        assert reason == "topic not found"

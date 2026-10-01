@@ -19,7 +19,8 @@ def manage_topics_menu(data):
         print("3. Delete topic")
         print("4. Change topic status")
         print("5. Add new note")
-        print("6. Back\n")
+        print("6. Delete note")
+        print("7. Back\n")
         print("===================================================================================\n")
 
         manage_choice = input("Please choose an option: ").strip()
@@ -108,6 +109,36 @@ def manage_topics_menu(data):
                 print("It's not possible to add an empty note!\n")
 
         elif manage_choice == "6":
+            print("You've chosen to delete a note from the topic.")
+            print("\n==================================================================================")
+            print("Current list of topics:")
+            print("==================================================================================\n")
+            menu_utils.print_numbered_list(topics.list_topics(data))
+            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data), prompt="Please choose a topic to delete a note: ")
+            if not topic_name:
+                continue
+            print(f"You've chosen: {topic_name}")
+            print("\n==================================================================================")
+            print(f'Current list of notes for {topic_name}:')
+            print("==================================================================================\n")
+            notes_list = topics.get_notes(data, topic_name)
+            if not notes_list:
+                print("No notes for this topic yet!\n")
+                continue
+            menu_utils.print_numbered_list(notes_list)
+            note_index = menu_utils.choose_from_numbered_list(notes_list,
+                                                              prompt="Please choose a note to delete: ",
+                                                              return_index=True)
+            if note_index is None:
+                continue
+            deleted, reason = topics.delete_note(data, topic_name, note_index)
+            if deleted:
+                print("Note deleted!\n")
+                menu_utils.print_numbered_topics_with_details(data)
+            elif reason == "incorrect index":
+                print("Impossible to delete, note index is incorrect.\n")
+
+        elif manage_choice == "7":
             break
 
         else:

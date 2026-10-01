@@ -69,3 +69,14 @@ def get_notes(data, topic_name):
     for entry in data["topics"]:
         if topic_name.lower() == entry["name"].lower():
             return entry["notes"]
+
+
+def delete_note(data, topic_name, note_index):
+    for topic in data["topics"]:
+        if topic["name"].lower() == topic_name.lower():
+            if note_index < 0 or note_index >= len(topic["notes"]):
+                return False, "incorrect index"
+            topic["notes"].pop(note_index)
+            storage.save_data(data)
+            return True, "deleted"
+    return False, "topic not found"
