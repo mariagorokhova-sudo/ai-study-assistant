@@ -22,7 +22,7 @@ def test_ai_api_error():
                                         "what is recursion?",
                                         "/exit"
                                     ]
-                                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                                    mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
                                     request = httpx.Request("POST", "https://api.openai.com/v1/responses")
                                     mock_ask.side_effect = openai.APIConnectionError(request=request)
                                     
@@ -51,8 +51,7 @@ def test_missing_api_key_returns_to_main_menu():
                                         "1",
                                         "what is recursion?"
                                     ]
-                                    mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
-                                    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                                    mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
                                     mock_ask.side_effect = ValueError("OPENAI_API_KEY is missing")
 
                                     ai_menu.manage_ai_menu(data)
@@ -76,7 +75,7 @@ def test_unexpected_value_error_is_raised():
                     "1",
                     "what is recursion?"
                 ]
-                mock_list_topics.return_value = ["recursion", "classes", "algorythms"]
+                mock_list_topics.return_value = ["recursion", "classes", "algorithms"]
                 mock_ask.side_effect = ValueError("Unexpected error")
 
                 with pytest.raises(ValueError, match="Unexpected error"):

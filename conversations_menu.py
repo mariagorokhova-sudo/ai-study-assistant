@@ -1,6 +1,7 @@
 import menu_utils
 import conversations
 import ai
+import openai
 import topics
 
 def manage_conversations_menu(data):
@@ -63,7 +64,17 @@ def manage_conversations_menu(data):
                                                                       include_other_option=False)
             if conversation_entry is None:
                 continue
-            conversation_summary = ai.summarize_conversation(conversation_entry)
+            try:
+                conversation_summary = ai.summarize_conversation(conversation_entry)
+            except openai.APIError as error:
+                print("Sorry, the AI request failed. Please try again.")
+                print(error)
+                continue
+            except ValueError as error:
+                if str(error) != "OPENAI_API_KEY is missing":
+                    raise
+                print("OPENAI_API_KEY is missing. Please add it to the .env file.")
+                continue
             if conversation_summary is None:
                 print("Cannot summarize an empty conversation!\n")
                 continue

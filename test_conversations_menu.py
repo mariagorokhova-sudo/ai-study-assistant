@@ -1,6 +1,8 @@
 import conversations_menu
 from unittest.mock import patch, call
 import pytest
+import httpx
+import openai
 
 def test_conversations_menu_back_option():
     data = {"topics": [], "conversations": []}
@@ -361,3 +363,56 @@ def test_conversations_menu_summarize_conversation_no_topic():
                     conversations_menu.manage_conversations_menu(data)
 
                     mock_print.assert_any_call("Topic not found, cannot add a note!\n")
+
+
+def test_create_summary_ai_api_error():
+    data = {
+        "topics": [],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["4", "1", "6"]) as mock_input:
+        with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
+            with patch("conversations_menu.topics.add_note") as mock_add_note:
+                with patch("builtins.print") as mock_print:
+                    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                    mock_summary.side_effect = openai.APIConnectionError(request=request)
+
+                    conversations_menu.manage_conversations_menu(data)
+
+                    mock_print.assert_any_call("Sorry, the AI request failed. Please try again.")
+                    mock_add_note.assert_not_called()
+
+
+def test_create_summary_missing_api_key():
+    data = {
+        "topics": [],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["4", "1", "6"]) as mock_input:
+        with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
+            with patch("builtins.print") as mock_print:
+                mock_summary.side_effect = ValueError("OPENAI_API_KEY is missing")
+
+                conversations_menu.manage_conversations_menu(data)
+
+                mock_print.assert_any_call("OPENAI_API_KEY is missing. Please add it to the .env file.")
