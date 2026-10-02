@@ -1,5 +1,7 @@
 import menu_utils
 import conversations
+import ai
+import topics
 
 def manage_conversations_menu(data):
     while True:
@@ -8,8 +10,9 @@ def manage_conversations_menu(data):
         print("1. View all conversations")
         print("2. View conversations on specific topic")
         print("3. View conversations counts by topic")
-        print("4. Delete a conversation")
-        print("5. Back\n")
+        print("4. Summarize a conversation")
+        print("5. Delete a conversation")
+        print("6. Back\n")
         print("===================================================================================\n")
 
         choice_history = input("Please choose an option: ").strip()
@@ -51,6 +54,29 @@ def manage_conversations_menu(data):
                 print(f"{topic}: {count}")
 
         elif choice_history == "4":
+            print("You've chosen to summarize a conversation.")
+            menu_utils.print_numbered_conversations(data["conversations"], include_new_option=False)
+            if not data["conversations"]:
+                continue
+            conversation_entry = menu_utils.choose_from_numbered_list(data["conversations"],
+                                                                      prompt="Please choose a conversation to summarize: ",
+                                                                      include_other_option=False)
+            if conversation_entry is None:
+                continue
+            conversation_summary = ai.summarize_conversation(conversation_entry)
+            if conversation_summary is None:
+                print("Cannot summarize an empty conversation!\n")
+                continue
+            added, reason = topics.add_note(data, conversation_entry["topic"], conversation_summary)
+            if added:
+                print(f"\nThe following summary was created: \n{conversation_summary}\n")
+                print("Conversation summary added as a note!")
+            elif reason == "topic not found":
+                print("Topic not found, cannot add a note!\n")
+            elif reason == "empty note":
+                print("Summary cannot be empty!\n")
+
+        elif choice_history == "5":
             print("You've chosen to delete a conversation.")
             menu_utils.print_numbered_conversations(data["conversations"], include_new_option=False)
             if not data["conversations"]:
@@ -68,7 +94,7 @@ def manage_conversations_menu(data):
             elif reason == "incorrect index":
                 print("Impossible to delete, conversation index is incorrect.\n")
 
-        elif choice_history == "5":
+        elif choice_history == "6":
             break
 
         else:

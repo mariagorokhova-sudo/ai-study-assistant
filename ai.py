@@ -84,3 +84,27 @@ def build_instructions(topic_name, ai_mode, notes=None):
         - {formatted_notes}"""
 
     return instructions
+
+
+def summarize_conversation(conversation_entry):
+    if not conversation_entry["messages"]:
+        return
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is missing")
+
+    client = OpenAI(api_key=api_key)
+    instructions = f"""
+        Summarize the entire conversation as a concise study note.
+        Include the key concepts, important details, and any corrections.
+        Do not mention a conversation or its participants.
+        Return only the study note.
+        """
+
+    response = client.responses.create(
+        model="gpt-5.6-luna",
+        instructions=instructions,
+        input=conversation_entry["messages"]
+    )
+
+    return response.output_text

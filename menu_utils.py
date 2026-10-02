@@ -48,6 +48,7 @@ def print_numbered_topics_with_details(data):
             print(f'Notes:')
             for note in topic_details["notes"]:
                 print(f'- {note}')
+                print("...................................................................................")
             print("-----------------------------------------------------------------------------------")
 
 

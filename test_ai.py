@@ -114,3 +114,40 @@ def test_open_api_key_does_not_exist(monkeypatch):
 def test_unknown_ai_mode():
     with pytest.raises(ValueError):
         ai.build_instructions("Recursion", "Unknown mode")
+
+
+def test_summarize_conversation():
+    conversation_entry = {
+        "topic": "Recursion",
+        "ai_mode": "Socratic tutor",
+        "messages": [
+            {"role": "user",
+            "content": "What is recursion?"},
+            {"role": "assistant",
+            "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+    }
+
+    with patch("ai.OpenAI") as mock_openai:
+        expected_summary = "Recursion solves a problem by reducing it to smaller instances."
+        mock_client = mock_openai.return_value
+        mock_client.responses.create.return_value.output_text = expected_summary
+
+        result = ai.summarize_conversation(conversation_entry)
+
+        assert result == expected_summary
+        mock_client.responses.create.assert_called_once()
+        call_kwargs = mock_client.responses.create.call_args.kwargs
+        assert call_kwargs["input"] == conversation_entry["messages"]
+
+
+def test_summarize_conversation_empty_messages():
+    conversation_entry = {
+        "topic": "Recursion",
+        "ai_mode": "Socratic tutor",
+        "messages": []
+    }
+    with patch("ai.OpenAI") as mock_openai:
+        result = ai.summarize_conversation(conversation_entry)
+
+        assert result is None
+        mock_openai.assert_not_called()
