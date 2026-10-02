@@ -39,7 +39,7 @@ def print_numbered_topics_with_details(data):
     print("===================================================================================\n")
     for number, topic_details in enumerate(data["topics"], start=1):
         print(f'{number}. {topic_details["name"]}\n')
-        print(f'Status: {topic_details["status"]}')
+        print(f'Status: {topic_details["status"]}\n')
         if not topic_details["notes"]:
             print("Notes: no notes yet!\n")
             print("-----------------------------------------------------------------------------------")

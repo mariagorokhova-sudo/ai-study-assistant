@@ -59,13 +59,13 @@ def test_print_numbered_topics_with_details():
         menu_utils.print_numbered_topics_with_details(data)
 
         mock_print.assert_any_call("1. recursion\n")
-        mock_print.assert_any_call("Status: in progress")
+        mock_print.assert_any_call("Status: in progress\n")
         mock_print.assert_any_call("Notes:")
         mock_print.assert_any_call("- note 1")
         mock_print.assert_any_call("...................................................................................")
         mock_print.assert_any_call("- note 2")
         mock_print.assert_any_call("2. classes\n")
-        mock_print.assert_any_call("Status: new")
+        mock_print.assert_any_call("Status: new\n")
         mock_print.assert_any_call("Notes: no notes yet!\n")
 
 
