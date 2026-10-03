@@ -80,3 +80,67 @@ def delete_note(data, topic_name, note_index):
             storage.save_data(data)
             return True, "deleted"
     return False, "topic not found"
+
+
+def assign_topic_to_course(data, topic_name, course_code):
+    course_code = course_code.strip().upper()
+    topic_name = topic_name.strip()
+    if not course_code or not topic_name:
+        return False, "empty field"
+    course_exists = any(
+        entry["code"].lower() == course_code.lower()
+        for entry in data["courses"]
+    )
+    if not course_exists:
+        return False, "course not found"
+    for entry in data["topics"]:
+        if entry["name"].lower() == topic_name.lower():
+            entry.setdefault("course_statuses", {})
+            if course_code in entry["course_statuses"]:
+                return False, "duplicate"
+            entry["course_statuses"][course_code] = "learning"
+            storage.save_data(data)
+            return True, "assigned"
+    return False, "topic not found"
+
+
+def change_topic_course_status(data, topic_name, course_code, new_status):
+    course_code = course_code.strip().upper()
+    topic_name = topic_name.strip()
+    new_status = new_status.strip().lower()
+    if not topic_name or not course_code:
+        return False, "empty field"
+    if new_status not in ("learning", "exam prep", "finished"):
+        return False, "invalid status"
+    for entry in data["topics"]:
+        if entry["name"].lower() == topic_name.lower():
+            if course_code not in entry.get("course_statuses", {}):
+                return False, "topic not assigned"
+            entry["course_statuses"][course_code] = new_status
+            storage.save_data(data)
+            return True, "changed"
+    return False, "topic not found"
+
+
+def unassign_topic_from_course(data, topic_name, course_code):
+    course_code = course_code.strip().upper()
+    topic_name = topic_name.strip()
+    if not course_code or not topic_name:
+        return False, "empty field"
+    for entry in data["topics"]:
+        if entry["name"].lower() == topic_name.lower():
+            if course_code not in entry.get("course_statuses", {}):
+                return False, "topic not assigned"
+            del entry["course_statuses"][course_code]
+            storage.save_data(data)
+            return True, "unassigned"
+    return False, "topic not found"
+
+
+def get_topics_for_course(data, course_code):
+    course_code = course_code.strip().upper()
+    topics_list = []
+    for entry in data["topics"]:
+        if course_code in entry.get("course_statuses", {}):
+            topics_list.append(entry)
+    return topics_list

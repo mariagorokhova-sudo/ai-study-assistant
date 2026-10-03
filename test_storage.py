@@ -10,6 +10,7 @@ def test_save_data(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
     data = {
+        "courses": [],
         "topics": [
             {
                 "name": "recursion",
@@ -34,7 +35,7 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
 
     loaded_data = storage.load_data()
 
-    assert loaded_data == {"topics": [], "conversations": []}
+    assert loaded_data == {"courses": [], "topics": [], "conversations": []}
 
 @pytest.mark.parametrize("data",
                          [
@@ -203,7 +204,7 @@ def test_save_new_conversation(tmp_path, monkeypatch):
 
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
-    data = {"topics": [], "conversations": []}
+    data = {"courses": [], "topics": [], "conversations": []}
     topic = "recursion"
     ai_mode = "socratic tutor"
 
@@ -220,6 +221,7 @@ def test_save_new_conversation(tmp_path, monkeypatch):
     loaded_data = storage.load_data()
 
     assert loaded_data == {
+        "courses": [],
         "topics": [], 
         "conversations": [
             {
@@ -261,3 +263,38 @@ def test_data_file_location_is_independent_of_working_directory(tmp_path, monkey
     monkeypatch.chdir(tmp_path)
 
     assert storage.DATA_FILE.exists()
+
+
+def test_add_courses_to_old_json(tmp_path, monkeypatch):
+    test_file = tmp_path / "test_data.json"
+    monkeypatch.setattr(storage, "DATA_FILE", test_file)
+
+    data = {"topics": [], "conversations": []}
+    storage.save_data(data)
+
+    assert test_file.exists()
+    
+    loaded_data = storage.load_data()
+    assert loaded_data == {"courses": [], "topics": [], "conversations": []}
+    assert list(loaded_data.keys()) == ["courses", "topics", "conversations"]
+
+
+def test_load_data_not_affect_existing_courses(tmp_path, monkeypatch):
+    test_file = tmp_path / "test_data.json"
+    monkeypatch.setattr(storage, "DATA_FILE", test_file)
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [],
+        "conversations": []
+    }
+    storage.save_data(data)
+    loaded_data = storage.load_data()
+
+    assert loaded_data == data

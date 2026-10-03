@@ -56,13 +56,15 @@ def load_data():
         except json.JSONDecodeError as error:
             raise ValueError("Invalid JSON file") from error
         if (
-            not isinstance(data, dict) 
+            not isinstance(data, dict)
             or not is_valid_topics(data.get("topics"))
             or not is_valid_conversations(data.get("conversations"))
         ):
             raise ValueError("Invalid data structure.")
+        if "courses" not in data:
+            data = {"courses": [], **data}
         return data
-    return {"topics":[], "conversations": []}
+    return {"courses": [], "topics":[], "conversations": []}
 
 
 def save_data(data):
