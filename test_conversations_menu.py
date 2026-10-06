@@ -209,7 +209,7 @@ def test_conversations_menu_delete_conversation_success():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["5", "1", "6"]):
+    with patch("builtins.input", side_effect = ["5", "1", "y", "6"]):
         with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
             with patch("builtins.print") as mock_print:
                 mock_delete.return_value = (True, "deleted")
@@ -223,13 +223,11 @@ def test_conversations_menu_delete_conversation_success():
 def test_conversations_menu_delete_conversation_empty_list():
     data = {"topics": [], "conversations": []}
     with patch("builtins.input", side_effect = ["5", "6"]):
-        with patch("conversations_menu.menu_utils.choose_from_numbered_list") as mock_choose:
-            with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
+        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
 
-                conversations_menu.manage_conversations_menu(data)
+            conversations_menu.manage_conversations_menu(data)
 
-                mock_choose.assert_not_called()
-                mock_delete.assert_not_called()
+            mock_delete.assert_not_called()
 
 
 def test_conversations_menu_delete_conversation_invalid_choice():

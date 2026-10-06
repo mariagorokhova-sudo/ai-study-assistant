@@ -558,3 +558,64 @@ def test_delete_course_empty_field():
             }
         ]
         mock_save.assert_not_called()
+
+
+def test_show_course_card():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "October 2026 - May 2027",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {"CM1035-01": "exam prep"},
+                "notes": ["Inheritance is important concept"]
+            }
+        ],
+        "conversations": []
+    }
+    with patch("builtins.print") as mock_print:
+        courses.show_course_card(data, data["courses"][0])
+
+        mock_print.assert_any_call("CM1035-01 - Algorithms and Data Structures I")
+        mock_print.assert_any_call("Session: October 2026 - May 2027")
+        mock_print.assert_any_call("Status: active")
+        mock_print.assert_any_call("Topics: 2\n")
+        mock_print.assert_any_call("learning: 1")
+        mock_print.assert_any_call("exam prep: 1")
+        mock_print.assert_any_call("finished: 0")
+
+
+def test_show_course_card_no_topics():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "October 2026 - May 2027",
+                "status": "active"
+            }
+        ],
+        "topics": [],
+        "conversations": []
+    }
+    with patch("builtins.print") as mock_print:
+        courses.show_course_card(data, data["courses"][0])
+
+        mock_print.assert_any_call("CM1035-01 - Algorithms and Data Structures I")
+        mock_print.assert_any_call("Session: October 2026 - May 2027")
+        mock_print.assert_any_call("Status: active")
+        mock_print.assert_any_call("Topics: 0\n")
+        mock_print.assert_any_call("learning: 0")
+        mock_print.assert_any_call("exam prep: 0")
+        mock_print.assert_any_call("finished: 0")

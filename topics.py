@@ -144,3 +144,23 @@ def get_topics_for_course(data, course_code):
         if course_code in entry.get("course_statuses", {}):
             topics_list.append(entry)
     return topics_list
+
+
+def show_topics_for_course(data, course_code):
+    if not data["topics"]:
+        print("No topics yet!\n")
+        return
+    course_code = course_code.strip().upper()
+    course_topics = get_topics_for_course(data, course_code)
+    if not course_topics:
+        print("No topics assigned to this course!\n")
+        return
+    statuses = ("learning", "exam prep", "finished")
+    topic_number = 1
+    for status in statuses:
+        print(f'{status}:')
+        for topic in course_topics:
+            if topic["course_statuses"][course_code] == status:
+                print(f'{topic_number}. {topic["name"]}')
+                topic_number += 1
+        print()

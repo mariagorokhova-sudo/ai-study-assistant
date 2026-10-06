@@ -13,14 +13,12 @@ def test_delete_topic_option_wrong_choice():
             }
         ]
     }
-    with patch("builtins.input", side_effect=["3", "7"]):
-        with patch("topics_menu.menu_utils.choose_from_numbered_list") as mock_choice:
-            with patch("topics_menu.topics.delete_topic") as mock_delete:
-                mock_choice.return_value = None
-                
-                topics_menu.manage_topics_menu(data)
+    with patch("builtins.input", side_effect=["3", "2", "7"]):
+        with patch("topics_menu.topics.delete_topic") as mock_delete:
 
-                mock_delete.assert_not_called()
+            topics_menu.manage_topics_menu(data)
+
+            mock_delete.assert_not_called()
 
 
 def test_delete_topic_option_success():
@@ -33,18 +31,15 @@ def test_delete_topic_option_success():
             }
         ]
     }
-    with patch("builtins.input", side_effect=["3", "7"]):
-        with patch("topics_menu.menu_utils.choose_from_numbered_list") as mock_choice:
-            with patch("menu_utils.print_numbered_list") as mock_print_numbered_topics:
-                with patch("topics_menu.topics.delete_topic") as mock_delete:
-                    with patch("builtins.print") as mock_print:
-                        mock_choice.return_value = "recursion"
-                        mock_delete.return_value = True, "deleted"
-                        topics_menu.manage_topics_menu(data)
+    with patch("builtins.input", side_effect=["3", "1", "y", "7"]):
+        with patch("menu_utils.print_numbered_list") as mock_print_numbered_topics:
+            with patch("topics_menu.topics.delete_topic") as mock_delete:
+                with patch("builtins.print") as mock_print:
+                    mock_delete.return_value = True, "deleted"
+                    topics_menu.manage_topics_menu(data)
 
-                        mock_delete.assert_called_once_with(data, "recursion")
-                        mock_print.assert_any_call("Topic deleted!")
-                        assert mock_print_numbered_topics.call_count == 3
+                    mock_delete.assert_called_once_with(data, "recursion")
+                    mock_print.assert_any_call("Topic deleted!")
 
 
 def test_change_topic_status_success():
@@ -57,20 +52,18 @@ def test_change_topic_status_success():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "in progress", "7"]):
+    with patch("builtins.input", side_effect = ["4", "1", "in progress", "7"]):
         with patch("topics_menu.topics.change_topic_status") as mock_change_status:
-            with patch("topics_menu.menu_utils.choose_from_numbered_list") as mock_choice:
-                with patch("builtins.print") as mock_print:
-                    with patch("menu_utils.print_numbered_topics_with_details") as mock_print_numbered_topics:
-                        mock_choice.return_value = "recursion"
-                        mock_change_status.return_value = (True, "changed")
+            with patch("builtins.print") as mock_print:
+                with patch("menu_utils.print_numbered_topics_with_details") as mock_print_numbered_topics:
+                    mock_change_status.return_value = (True, "changed")
 
-                        topics_menu.manage_topics_menu(data)
+                    topics_menu.manage_topics_menu(data)
 
-                        mock_change_status.assert_called_once_with(data, "recursion", "in progress")
-                        mock_print.assert_any_call("Status changed!")
-                        mock_print_numbered_topics.assert_called_once_with(data)
-                        
+                    mock_change_status.assert_called_once_with(data, "recursion", "in progress")
+                    mock_print.assert_any_call("Status changed!")
+                    mock_print_numbered_topics.assert_called_once_with(data)
+
 
 def test_change_topic_status_unsuccessful():
     data = {
@@ -82,17 +75,15 @@ def test_change_topic_status_unsuccessful():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "in progress", "7"]):
+    with patch("builtins.input", side_effect = ["4", "1", "in progress", "7"]):
         with patch("topics_menu.topics.change_topic_status") as mock_change_status:
-            with patch("topics_menu.menu_utils.choose_from_numbered_list") as mock_choice:
-                with patch("builtins.print") as mock_print:
-                    mock_choice.return_value = "recursion"
-                    mock_change_status.return_value = (False, "invalid status")
+            with patch("builtins.print") as mock_print:
+                mock_change_status.return_value = (False, "invalid status")
 
-                    topics_menu.manage_topics_menu(data)
+                topics_menu.manage_topics_menu(data)
 
-                    mock_change_status.assert_called_once_with(data, "recursion", "in progress")
-                    mock_print.assert_any_call("Invalid status!\n")
+                mock_change_status.assert_called_once_with(data, "recursion", "in progress")
+                mock_print.assert_any_call("Invalid status!\n")
 
 
 def test_topics_menu_add_new_note():
@@ -104,33 +95,29 @@ def test_topics_menu_add_new_note():
                 "notes": []
             },
             {
-                "name": "binary tress",
+                "name": "binary trees",
                 "status": "in progress",
                 "notes": ["Binary tree is a..."]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["5", "Tree has a root node", "7"]):
-        with patch("menu_utils.choose_from_numbered_list") as mock_choice:
-            with patch("topics_menu.topics.add_note") as mock_add_note:
-                mock_choice.return_value = "binary trees"
-                mock_add_note.return_value = (True, "added")
+    with patch("builtins.input", side_effect = ["5", "2", "Tree has a root node", "7"]):
+        with patch("topics_menu.topics.add_note") as mock_add_note:
+            mock_add_note.return_value = (True, "added")
 
-                topics_menu.manage_topics_menu(data)
+            topics_menu.manage_topics_menu(data)
 
-                mock_add_note.assert_called_once_with(data, "binary trees", "Tree has a root node")
+            mock_add_note.assert_called_once_with(data, "binary trees", "Tree has a root node")
 
 
 def test_topics_menu_add_new_note_empty_list():
     data = {"topics":[], "conversations": []}
     with patch("builtins.input", side_effect = ["5", "7"]):
-        with patch("menu_utils.choose_from_numbered_list") as mock_choice:
-            with patch("topics_menu.topics.add_note") as mock_add_note:
-                mock_choice.return_value = None
+        with patch("topics_menu.topics.add_note") as mock_add_note:
 
-                topics_menu.manage_topics_menu(data)
+            topics_menu.manage_topics_menu(data)
 
-                mock_add_note.assert_not_called()
+            mock_add_note.assert_not_called()
 
 
 def test_topics_menu_get_topics_with_details():
@@ -168,7 +155,7 @@ def test_topics_menu_delete_note_success():
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect=["6", "1", "1", "7"]):
+    with patch("builtins.input", side_effect=["6", "1", "1", "y", "7"]):
         with patch("topics_menu.topics.delete_note") as mock_delete_note:
             mock_delete_note.return_value = (True, "deleted")
 

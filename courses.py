@@ -1,4 +1,5 @@
 import storage
+import topics
 
 def add_course(data, code, course_name, session):
     code = code.strip().upper()
@@ -74,3 +75,29 @@ def delete_course(data, course_code):
             storage.save_data(data)
             return True, "deleted"
     return False, "course not found"
+
+
+def show_course_card(data, course_entry):
+    course_topics_list = topics.get_topics_for_course(data, course_entry["code"])
+    course_topic_count = len(course_topics_list)
+    learning_count = 0
+    exam_prep_count = 0
+    finished_count = 0
+    for topic in course_topics_list:
+        topic_status = topic["course_statuses"][course_entry["code"]]
+        if  topic_status == "learning":
+            learning_count += 1
+        elif topic_status == "exam prep":
+            exam_prep_count += 1
+        elif topic_status == "finished":
+            finished_count += 1
+    print("\n==============================================")
+    print(f'{course_entry["code"]} - {course_entry["name"]}')
+    print("==============================================\n")
+    print(f'Session: {course_entry["session"]}')
+    print(f'Status: {course_entry["status"]}')
+    print(f'Topics: {course_topic_count}\n')
+    print(f'learning: {learning_count}')
+    print(f'exam prep: {exam_prep_count}')
+    print(f'finished: {finished_count}')
+    print("\n=================================\n")

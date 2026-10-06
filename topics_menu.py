@@ -12,26 +12,27 @@ def manage_topics_menu(data):
         menu_utils.print_numbered_list(topics.list_topics(data))
     
     while True:
+        topics_options = [
+            "List topics with details",
+            "Add topic",
+            "Delete topic",
+            "Change topic status",
+            "Add new note",
+            "Delete note",
+            "Back"
+        ]
         print("===================================================================================")
-        print("You can choose from the following options:\n")
-        print("1. List topics with details")
-        print("2. Add topic")
-        print("3. Delete topic")
-        print("4. Change topic status")
-        print("5. Add new note")
-        print("6. Delete note")
-        print("7. Back\n")
+        menu_utils.print_numbered_list(topics_options)
+        topics_choice = menu_utils.choose_from_numbered_list(topics_options)
         print("===================================================================================\n")
 
-        manage_choice = input("Please choose an option: ").strip()
-
-        if manage_choice == "1":
+        if topics_choice == "List topics with details":
             if not data["topics"]:
                 print("No topics yet!")
             else:
                 menu_utils.print_numbered_topics_with_details(data)
 
-        elif manage_choice == "2":
+        elif topics_choice == "Add topic":
             print("You've chosen to add topic.")
             topic_name = input("Please enter a topic name: ")
             print(f"\nYou've entered: {topic_name}")
@@ -48,7 +49,7 @@ def manage_topics_menu(data):
             elif reason == "duplicate":
                 print("Topic already exists!\n")
 
-        elif manage_choice == "3":
+        elif topics_choice == "Delete topic":
             if not data["topics"]:
                 print("No topics yet!")
                 continue
@@ -62,16 +63,20 @@ def manage_topics_menu(data):
             if not topic_name:
                 continue
             print(f"\nYou've chosen: {topic_name}")
-            deleted, reason = topics.delete_topic(data, topic_name)
+            confirmation = input("Please confirm you would like to delete this topic: Y/N?").strip().lower()
+            if confirmation == "y":
+                deleted, reason = topics.delete_topic(data, topic_name)
+                if deleted:
+                    print("Topic deleted!")
+                    print("\n===================================================================================")
+                    print("Updated list of topics:")
+                    print("===================================================================================\n")
+                    menu_utils.print_numbered_list(topics.list_topics(data))
+            else:
+                print("Topic is not deleted!\n")
+                continue
 
-            if deleted:
-                print("Topic deleted!")
-                print("\n===================================================================================")
-                print("Updated list of topics:")
-                print("===================================================================================\n")
-                menu_utils.print_numbered_list(topics.list_topics(data))
-
-        elif manage_choice == "4":
+        elif topics_choice == "Change topic status":
             print("You've chosen to change topic status.")
             print("\n===========================")
             print("Current list of topics:")
@@ -90,7 +95,7 @@ def manage_topics_menu(data):
             elif reason == "invalid status":
                 print("Invalid status!\n")
 
-        elif manage_choice == "5":
+        elif topics_choice == "Add new note":
             print("You've chosen to add a note to the topic.")
             print("\n==================================================================================")
             print("Current list of topics:")
@@ -108,7 +113,7 @@ def manage_topics_menu(data):
             elif reason == "empty note":
                 print("It's not possible to add an empty note!\n")
 
-        elif manage_choice == "6":
+        elif topics_choice == "Delete note":
             print("You've chosen to delete a note from the topic.")
             print("\n==================================================================================")
             print("Current list of topics:")
@@ -131,15 +136,17 @@ def manage_topics_menu(data):
                                                               return_index=True)
             if note_index is None:
                 continue
-            deleted, reason = topics.delete_note(data, topic_name, note_index)
-            if deleted:
-                print("Note deleted!\n")
-                menu_utils.print_numbered_topics_with_details(data)
-            elif reason == "incorrect index":
-                print("Impossible to delete, note index is incorrect.\n")
+            confirmation = input("Please confirm you would like to delete this note: Y/N?").strip().lower()
+            if confirmation == "y":
+                deleted, reason = topics.delete_note(data, topic_name, note_index)
+                if deleted:
+                    print("Note deleted!\n")
+                    menu_utils.print_numbered_topics_with_details(data)
+                elif reason == "incorrect index":
+                    print("Impossible to delete, note index is incorrect.\n")
+            else:
+                print("Note is not deleted!\n")
+                continue
 
-        elif manage_choice == "7":
+        elif topics_choice == "Back":
             break
-
-        else:
-            print("Invalid option!\n")
