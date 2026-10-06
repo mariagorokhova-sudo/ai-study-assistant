@@ -10,7 +10,7 @@ def add_topic(data, name):
         return False, "empty"
     new_topic = {
         "name": name,
-        "status": "new",
+        "course_statuses": {},
         "notes": []
     }
     for topic in data["topics"]:
@@ -35,23 +35,13 @@ def delete_topic(data, name):
         return False, "empty"
     for topic in data["topics"]:
         if topic["name"].lower() == name.lower():
+            for conversation in data["conversations"]:
+                if conversation["topic"].lower() == topic["name"].lower():
+                    return False, "topic has conversations"
             data["topics"].remove(topic)
             storage.save_data(data)
             return True, "deleted"
     return False, "not found"
-
-
-def change_topic_status(data, topic_name, new_status):
-    new_status = new_status.strip().lower()
-    valid_statuses = {"new", "in progress", "exam prep", "finished"}
-    if new_status not in valid_statuses:
-        return False, "invalid status"
-    for entry in data["topics"]:
-        if entry["name"].lower() == topic_name.lower():
-            entry["status"] = new_status
-            storage.save_data(data)
-            return True, "changed"
-    return False, "topic not found"
 
 
 def add_note(data, topic_name, new_note):

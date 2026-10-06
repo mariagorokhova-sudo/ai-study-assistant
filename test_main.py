@@ -48,8 +48,18 @@ def test_manage_conversations_add_to_main_menu():
 def test_main_json_file_damaged():
     with patch("main.topics.load_data") as mock_load:
         with patch("builtins.print") as mock_print:
-            mock_load.side_effect = ValueError("Invalid JSON file")
+            mock_load.side_effect = ValueError("Invalid JSON file.")
 
             main.main()
 
-            mock_print.assert_any_call("JSON file is corrupted and cannot be read.")
+            mock_print.assert_any_call("Invalid JSON file.")
+
+
+def test_main_json_file_invalid_structure():
+    with patch("main.topics.load_data") as mock_load:
+        with patch("builtins.print") as mock_print:
+            mock_load.side_effect = ValueError("Invalid data structure.")
+
+            main.main()
+
+            mock_print.assert_any_call("Invalid data structure.")

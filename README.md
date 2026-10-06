@@ -3,12 +3,13 @@
 The application is designed for first-year Computer Science students to help them organize their studies, keep notes on specific topics they are learning, and discuss their questions with an AI assistant.
 
 ## Features
-1. Add, view, and delete study topics.
-2. Change a topic's status, and add notes to or delete notes from a specific topic.
-3. Discuss questions with AI in 5 different learning modes.
-4. Save, browse, continue and delete previous AI conversations.
-5. Use up to 10 recent conversation messages and 10 recent topic notes as AI context.
-6. Summarize AI conversations and save the summaries as notes for the corresponding topics.
+1. Add, view, edit, and delete study courses, change course statuses, and assign topics to courses.
+2. Add, view, and delete study topics.
+3. Track a topic's status separately for each course, and add notes to or delete notes from a specific topic.
+4. Discuss questions with AI in 5 different learning modes.
+5. Save, browse, continue and delete previous AI conversations.
+6. Use up to 10 recent conversation messages and 10 recent topic notes as AI context.
+7. Summarize AI conversations and save the summaries as notes for the corresponding topics.
 
 ## AI modes
 1. Tutor - immediately answers the question at a beginner level, gives a concrete example.
@@ -54,28 +55,39 @@ python -m pytest -v
 
 ## Project structure
 - `main.py` - application entry point and main menu.
+- `courses.py` - study course creation, deletion, status management, topic assignment and progress tracking.
 - `ai.py` - OpenAI API requests and instructions for 5 AI learning modes, and conversations summarization.
 - `topics.py` - study topic creation, deletion, status management, and notes.
 - `conversations.py` - conversation creation and deletion, message management, filtering, and statistics.
 - `storage.py` - loading data from and saving data to the JSON file.
-- `topics_menu.py`, `ai_menu.py`, and `conversations_menu.py` - command-line menus for the main application features.
+- `courses_menu.py`, `topics_menu.py`, `ai_menu.py`, and `conversations_menu.py` - command-line menus for the main application features.
 - `menu_utils.py` - shared functions for displaying numbered lists and processing menu selections.
 - `test_*.py` - automated tests for the application functionality.
 
 ## Data storage
-Application data is stored locally in `data.json`. The file contains 2 main lists:
+Application data is stored locally in `data.json`. The file contains 3 main lists:
 ```json
 {
+    "courses": [],
     "topics": [],
     "conversations": []
 }
 ```
-
-Each topic contains a name, status, and a list of notes.
+Each course contains a unique course code, a name, a session and status.
 ```json
 {
-    "name": "recursion",
-    "status": "new",
+    "code": "CM1005-01",
+    "name": "Introduction to Programming I",
+    "session": "October 2026 - March 2027",
+    "status": "active"
+}
+```
+
+Each topic contains a name, a status for each assigned course, and a list of notes.
+```json
+{
+    "name": "Recursion",
+    "course_statuses": {"CM1005-01": "learning"},
     "notes": []
 }
 ```

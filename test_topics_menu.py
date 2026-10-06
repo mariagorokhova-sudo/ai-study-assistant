@@ -8,12 +8,12 @@ def test_delete_topic_option_wrong_choice():
         "topics":[
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ]
     }
-    with patch("builtins.input", side_effect=["3", "2", "7"]):
+    with patch("builtins.input", side_effect=["3", "2", "6"]):
         with patch("topics_menu.topics.delete_topic") as mock_delete:
 
             topics_menu.manage_topics_menu(data)
@@ -26,12 +26,12 @@ def test_delete_topic_option_success():
         "topics":[
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ]
     }
-    with patch("builtins.input", side_effect=["3", "1", "y", "7"]):
+    with patch("builtins.input", side_effect=["3", "1", "y", "6"]):
         with patch("menu_utils.print_numbered_list") as mock_print_numbered_topics:
             with patch("topics_menu.topics.delete_topic") as mock_delete:
                 with patch("builtins.print") as mock_print:
@@ -42,48 +42,37 @@ def test_delete_topic_option_success():
                     mock_print.assert_any_call("Topic deleted!")
 
 
-def test_change_topic_status_success():
+def test_delete_topic_option_unsuccess_has_conversations():
     data = {
         "topics":[
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
+            }
+        ],
+        "conversations": [
+            {
+                "topic": "recursion",
+                "ai_mode": "Tutor",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "what is recursion?"
+                    }
+                ]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "in progress", "7"]):
-        with patch("topics_menu.topics.change_topic_status") as mock_change_status:
-            with patch("builtins.print") as mock_print:
-                with patch("menu_utils.print_numbered_topics_with_details") as mock_print_numbered_topics:
-                    mock_change_status.return_value = (True, "changed")
-
+    with patch("builtins.input", side_effect=["3", "1", "y", "6"]):
+        with patch("menu_utils.print_numbered_list") as mock_print_numbered_topics:
+            with patch("topics_menu.topics.delete_topic") as mock_delete:
+                with patch("builtins.print") as mock_print:
+                    mock_delete.return_value = False, "topic has conversations"
                     topics_menu.manage_topics_menu(data)
 
-                    mock_change_status.assert_called_once_with(data, "recursion", "in progress")
-                    mock_print.assert_any_call("Status changed!")
-                    mock_print_numbered_topics.assert_called_once_with(data)
-
-
-def test_change_topic_status_unsuccessful():
-    data = {
-        "topics":[
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": []
-            }
-        ]
-    }
-    with patch("builtins.input", side_effect = ["4", "1", "in progress", "7"]):
-        with patch("topics_menu.topics.change_topic_status") as mock_change_status:
-            with patch("builtins.print") as mock_print:
-                mock_change_status.return_value = (False, "invalid status")
-
-                topics_menu.manage_topics_menu(data)
-
-                mock_change_status.assert_called_once_with(data, "recursion", "in progress")
-                mock_print.assert_any_call("Invalid status!\n")
+                    mock_delete.assert_called_once_with(data, "recursion")
+                    mock_print.assert_any_call("This topic has conversations associated, not possible to delete!\n")
 
 
 def test_topics_menu_add_new_note():
@@ -91,17 +80,17 @@ def test_topics_menu_add_new_note():
         "topics":[
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             },
             {
                 "name": "binary trees",
-                "status": "in progress",
+                "course_statuses": {},
                 "notes": ["Binary tree is a..."]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["5", "2", "Tree has a root node", "7"]):
+    with patch("builtins.input", side_effect = ["4", "2", "Tree has a root node", "6"]):
         with patch("topics_menu.topics.add_note") as mock_add_note:
             mock_add_note.return_value = (True, "added")
 
@@ -112,7 +101,7 @@ def test_topics_menu_add_new_note():
 
 def test_topics_menu_add_new_note_empty_list():
     data = {"topics":[], "conversations": []}
-    with patch("builtins.input", side_effect = ["5", "7"]):
+    with patch("builtins.input", side_effect = ["4", "6"]):
         with patch("topics_menu.topics.add_note") as mock_add_note:
 
             topics_menu.manage_topics_menu(data)
@@ -130,13 +119,13 @@ def test_topics_menu_get_topics_with_details():
             },
             {
                 "name": "classes",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect = ["1", "7"]):
+    with patch("builtins.input", side_effect = ["1", "6"]):
         with patch("topics_menu.menu_utils.print_numbered_topics_with_details") as mock_print_numbered_topics:
 
             topics_menu.manage_topics_menu(data)
@@ -149,13 +138,13 @@ def test_topics_menu_delete_note_success():
         "topics": [
             {
                 "name": "Recursion",
-                "status": "in progress",
+                "course_statuses": {},
                 "notes": ["base case", "recursive case"]
             }
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect=["6", "1", "1", "y", "7"]):
+    with patch("builtins.input", side_effect=["5", "1", "1", "y", "6"]):
         with patch("topics_menu.topics.delete_note") as mock_delete_note:
             mock_delete_note.return_value = (True, "deleted")
 
@@ -175,7 +164,7 @@ def test_topics_menu_delete_note_empty_notes():
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect=["6", "1", "7"]):
+    with patch("builtins.input", side_effect=["5", "1", "6"]):
         with patch("topics_menu.topics.delete_note") as mock_delete_note:
             with patch("builtins.print") as mock_print:
 
@@ -196,7 +185,7 @@ def test_topics_menu_delete_note_incorrect_index():
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect=["6", "1", "3", "7"]):
+    with patch("builtins.input", side_effect=["5", "1", "3", "6"]):
         with patch("topics_menu.topics.delete_note") as mock_delete_note:
 
             topics_menu.manage_topics_menu(data)

@@ -43,13 +43,13 @@ def test_print_numbered_topics_with_details():
     data = {
         "topics": [
             {
-                "name": "recursion",
-                "status": "in progress",
+                "name": "Recursion",
+                "course_statuses": {"CM1005-01": "learning", "CM1035-01": "exam prep"},
                 "notes": ["note 1", "note 2"]
             },
             {
                 "name": "classes",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ],
@@ -58,14 +58,16 @@ def test_print_numbered_topics_with_details():
     with patch("builtins.print") as mock_print:
         menu_utils.print_numbered_topics_with_details(data)
 
-        mock_print.assert_any_call("1. recursion\n")
-        mock_print.assert_any_call("Status: in progress\n")
+        mock_print.assert_any_call("1. Recursion\n")
+        mock_print.assert_any_call("Course statuses:")
+        mock_print.assert_any_call("- CM1005-01: learning")
+        mock_print.assert_any_call("- CM1035-01: exam prep")
         mock_print.assert_any_call("Notes:")
         mock_print.assert_any_call("- note 1")
         mock_print.assert_any_call("...................................................................................")
         mock_print.assert_any_call("- note 2")
         mock_print.assert_any_call("2. classes\n")
-        mock_print.assert_any_call("Status: new\n")
+        mock_print.assert_any_call("Topic is not assigned to any courses.\n")
         mock_print.assert_any_call("Notes: no notes yet!\n")
 
 

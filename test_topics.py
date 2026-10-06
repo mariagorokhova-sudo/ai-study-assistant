@@ -13,7 +13,7 @@ def test_add_topic():
         assert data["topics"] == [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ]
@@ -25,7 +25,7 @@ def test_add_duplicate_topic():
         "topics": [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
         ]
@@ -40,7 +40,7 @@ def test_add_duplicate_topic():
                     "topics": [
                         {
                             "name": "recursion",
-                            "status": "new",
+                            "course_statuses": {},
                             "notes": ""
                         }
                     ]
@@ -53,7 +53,7 @@ def test_add_duplicate_topic_different_case():
         "topics": [
             {
                 "name": "classes",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
         ]
@@ -68,7 +68,7 @@ def test_add_duplicate_topic_different_case():
                     "topics": [
                         {
                             "name": "classes",
-                            "status": "new",
+                            "course_statuses": {},
                             "notes": ""
                         }
                     ]
@@ -81,7 +81,7 @@ def test_add_empty_topic():
         "topics": [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
         ]
@@ -96,7 +96,7 @@ def test_add_empty_topic():
             "topics": [
                 {
                     "name": "recursion",
-                    "status": "new",
+                    "course_statuses": {},
                     "notes": ""
                 }
             ]
@@ -105,20 +105,21 @@ def test_add_empty_topic():
         mock_save.assert_not_called()
 
 
-def test_delete_topic():
+def test_delete_topic_success():
     data = {
         "topics": [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             },
             {
                 "name": "git",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
-        ]
+        ],
+        "conversations": []
     }
 
     with patch("topics.storage.save_data") as mock_save:
@@ -130,12 +131,61 @@ def test_delete_topic():
             "topics": [
                 {
                     "name": "git",
-                    "status": "new",
+                    "course_statuses": {},
                     "notes": ""
                 }
-            ]
+            ],
+            "conversations": []
         }
         mock_save.assert_called_once_with(data)
+
+
+def test_delete_topic_unsuccess_conversations_associated():
+    data = {
+        "topics": [
+            {
+                "name": "recursion",
+                "course_statuses": {},
+                "notes": ""
+            },
+            {
+                "name": "git",
+                "course_statuses": {},
+                "notes": ""
+            }
+        ],
+        "conversations": [
+            {
+                "topic": "recursion",
+                "ai_mode": "Tutor",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "what is recursion?"
+                    }
+                ]
+            }
+        ]
+    }
+
+    with patch("topics.storage.save_data") as mock_save:
+        deleted, reason = topics.delete_topic(data, "recursion")
+
+        assert deleted is False
+        assert reason == "topic has conversations"
+        assert data["topics"] == [
+            {
+                "name": "recursion",
+                "course_statuses": {},
+                "notes": ""
+            },
+            {
+                "name": "git",
+                "course_statuses": {},
+                "notes": ""
+            }
+        ]
+        mock_save.assert_not_called()
 
 
 def test_delete_topic_not_found():
@@ -143,7 +193,7 @@ def test_delete_topic_not_found():
         "topics": [
             {
                 "name": "git",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
         ]
@@ -158,7 +208,7 @@ def test_delete_topic_not_found():
             "topics": [
                 {
                     "name": "git",
-                    "status": "new",
+                    "course_statuses": {},
                     "notes": ""
                 }
             ]
@@ -171,7 +221,7 @@ def test_delete_empty_topic():
         "topics": [
             {
                 "name": "git",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ""
             }
         ]
@@ -186,70 +236,12 @@ def test_delete_empty_topic():
             "topics": [
                 {
                     "name": "git",
-                    "status": "new",
+                    "course_statuses": {},
                     "notes": ""
                 }
             ]
         }
 
-        mock_save.assert_not_called()
-
-
-def test_change_topic_status():
-    with patch("topics.storage.save_data") as mock_save:
-        data = {
-            "topics": [
-                {
-                    "name": "recursion",
-                    "status": "new",
-                    "notes": []
-                }
-            ]
-        }
-
-        topic_name = "Recursion"
-        new_status = " In Progress "
-
-        topics.change_topic_status(data, topic_name, new_status)
-
-        assert data["topics"] == [
-            {
-                "name": "recursion",
-                "status": "in progress",
-                "notes": []
-            }
-        ]
-       
-        mock_save.assert_called_once_with(data)
-
-
-@pytest.mark.parametrize(
-    "topic_name, new_status, reason", 
-    [("recursion", "banana", "invalid status"), 
-    ("graphs", "in progress", "topic not found")])
-def test_change_topic_status_invalid_input(topic_name, new_status, reason):
-    with patch("topics.storage.save_data") as mock_save:
-        data = {
-            "topics": [
-                {
-                    "name": "recursion",
-                    "status": "new",
-                    "notes": ""
-                }
-            ]
-        }
-
-        result, actual_reason = topics.change_topic_status(data, topic_name, new_status)
-
-        assert result == False
-        assert actual_reason == reason
-        assert data["topics"] == [
-            {
-                "name": "recursion",
-                "status": "new",
-                "notes": ""
-            }
-        ]
         mock_save.assert_not_called()
 
 
@@ -259,7 +251,7 @@ def test_add_note_to_existing_notes():
                 "topics": [
                     {
                         "name": "recursion",
-                        "status": "new",
+                        "course_statuses": {},
                         "notes": ["Base case stops recursion"]
                     }
                 ]
@@ -274,7 +266,7 @@ def test_add_note_to_existing_notes():
         assert data["topics"] == [
                     {
                         "name": "recursion",
-                        "status": "new",
+                        "course_statuses": {},
                         "notes": ["Base case stops recursion",
                                 "Recursive case calls the function again"]
                     }
@@ -292,7 +284,7 @@ def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
             "topics": [
                 {
                     "name": "recursion",
-                    "status": "new",
+                    "course_statuses": {},
                     "notes": ["Base case stops recursion"]
                 }
             ]
@@ -304,7 +296,7 @@ def test_add_note_to_existing_notes_invalid_input(topic_name, new_note, reason):
         assert data["topics"] == [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ["Base case stops recursion"]
             }
         ]
@@ -578,7 +570,6 @@ def test_assign_topic_to_course_no_course_statuses_key():
         "topics": [
             {
                 "name": "Recursion",
-                "status": "new",
                 "notes": ["base case", "recursive case"]
             }
         ],
@@ -857,7 +848,7 @@ def test_unassign_topic_from_course_no_course_statuses():
         "topics": [
             {
                 "name": "Recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ["base case", "recursive case"]
             }
         ],
@@ -870,7 +861,7 @@ def test_unassign_topic_from_course_no_course_statuses():
         assert reason == "topic not assigned"
         assert data["topics"][0] == {
                 "name": "Recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": ["base case", "recursive case"]
             }
         mock_save.assert_not_called()

@@ -196,7 +196,7 @@ def test_manage_courses_menu_assign_topic_to_course_no_topics():
                     mock_print.assert_any_call("No topics available for assignment!\n")
 
 
-def test_manage_courses_menu_change_topic_status_success():
+def test_manage_courses_menu_change_topic_course_status_success():
     data = {
         "courses": [
             {
@@ -225,7 +225,7 @@ def test_manage_courses_menu_change_topic_status_success():
                     mock_print.assert_any_call("Status of topic Recursion is changed to exam prep!\n")
 
 
-def test_manage_courses_menu_change_topic_status_no_topic_aasigned():
+def test_manage_courses_menu_change_topic_course_status_no_topic_assigned():
     data = {
         "courses": [
             {

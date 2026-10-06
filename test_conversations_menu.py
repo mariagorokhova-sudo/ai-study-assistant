@@ -267,7 +267,7 @@ def test_conversations_menu_summarize_conversation_success():
         "topics": [
             {
                 "name": "Recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ],

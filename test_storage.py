@@ -14,7 +14,7 @@ def test_save_data(tmp_path, monkeypatch):
         "topics": [
             {
                 "name": "recursion",
-                "status": "new",
+                "course_statuses": {},
                 "notes": []
             }
         ],
@@ -39,14 +39,66 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("data",
                          [
-                            {"topics": "", "conversations":[]},
-                            {"topics": [], "conversations": ""},
+                            {"courses": "", "topics": [], "conversations": []},
+                            {"courses": [], "topics": "", "conversations":[]},
+                            {"courses": [], "topics": [], "conversations": ""},
                             [],
-                            {"topics": ["recursion"], "conversations": []},
+                            {"courses": ["Data structures"], "topics": [], "conversations": []},
+                            {"courses": [
+                                {
+                                    "code": "XX1035-01",
+                                    "session": "October - March 2027",
+                                    "status": "active"
+                                }
+                            ],
+                            "topics": [],
+                            "conversations": []},
+                            {"courses": [
+                                {
+                                    "code": 123,
+                                    "name": "Algorithms and Data Structures I",
+                                    "session": "October - March 2027",
+                                    "status": "active"
+                                }
+                            ],
+                            "topics": [],
+                            "conversations": []},
+                            {"courses": [
+                                {
+                                    "code": "XX1035-01",
+                                    "name": 123,
+                                    "session": "October - March 2027",
+                                    "status": "active"
+                                }
+                            ],
+                            "topics": [],
+                            "conversations": []},
+                            {"courses": [
+                                {
+                                    "code": "XX1035-01",
+                                    "name": "Algorithms and Data Structures",
+                                    "session": 123,
+                                    "status": "active"
+                                }
+                            ],
+                            "topics": [],
+                            "conversations": []},
+                            {"courses": [
+                                {
+                                    "code": "XX1035-01",
+                                    "name": "Algorithms and Data Structures",
+                                    "session": "October - March 2027",
+                                    "status": 123
+                                }
+                            ],
+                            "topics": [],
+                            "conversations": []},
+                            {"courses": [], "topics": ["recursion"], "conversations": []},
                             {
+                                "courses": [],
                                 "topics": [
                                     {
-                                        "status": "new",
+                                        "course_statuses": {},
                                         "notes": []
                                     }
                                 ],
@@ -56,7 +108,7 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
                                 "topics": [
                                     {
                                         "name": 123,
-                                        "status": "new",
+                                        "course_statuses": {},
                                         "notes": []
                                     }
                                 ],
@@ -66,7 +118,7 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
                                 "topics": [
                                     {
                                         "name": "Recursion",
-                                        "status": 123,
+                                        "course_statuses": [],
                                         "notes": ["A note"]
                                     }
                                 ],
@@ -76,7 +128,17 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
                                 "topics": [
                                     {
                                         "name": "Recursion",
-                                        "status": "new",
+                                        "course_statuses": {"XX1035-01": 123},
+                                        "notes": ["A note"]
+                                    }
+                                ],
+                                "conversations": []
+                            },
+                            {
+                                "topics": [
+                                    {
+                                        "name": "Recursion",
+                                        "course_statuses": {},
                                         "notes": "A note"
                                     }
                                 ],
@@ -86,7 +148,7 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
                                 "topics": [
                                     {
                                         "name": "Recursion",
-                                        "status": "new",
+                                        "course_statuses": {},
                                         "notes": ["A note", 123]
                                     }
                                 ],
@@ -186,8 +248,6 @@ def test_load_data_when_file_does_not_exist(tmp_path, monkeypatch):
                                 ]
                             }
                          ])
-
-
 def test_load_data_invalid_structure(tmp_path, monkeypatch, data):
     test_file = tmp_path / "test_data.json"
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
@@ -270,7 +330,8 @@ def test_add_courses_to_old_json(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
 
     data = {"topics": [], "conversations": []}
-    storage.save_data(data)
+    with test_file.open("w") as file:
+        json.dump(data, file)
 
     assert test_file.exists()
     

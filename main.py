@@ -8,8 +8,8 @@ import menu_utils
 def main():
     try:
         data = topics.load_data()
-    except ValueError:
-        print("JSON file is corrupted and cannot be read.")
+    except ValueError as error:
+        print(str(error))
         return
     while True:
         print("\n============================")

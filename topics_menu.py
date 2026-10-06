@@ -16,7 +16,6 @@ def manage_topics_menu(data):
             "List topics with details",
             "Add topic",
             "Delete topic",
-            "Change topic status",
             "Add new note",
             "Delete note",
             "Back"
@@ -72,28 +71,11 @@ def manage_topics_menu(data):
                     print("Updated list of topics:")
                     print("===================================================================================\n")
                     menu_utils.print_numbered_list(topics.list_topics(data))
+                elif reason == "topic has conversations":
+                    print("This topic has conversations associated, not possible to delete!\n")
             else:
                 print("Topic is not deleted!\n")
                 continue
-
-        elif topics_choice == "Change topic status":
-            print("You've chosen to change topic status.")
-            print("\n===========================")
-            print("Current list of topics:")
-            print("===========================\n")
-            menu_utils.print_numbered_list(topics.list_topics(data))
-            topic_name = menu_utils.choose_from_numbered_list(topics.list_topics(data), prompt="Please choose a topic to change status: ")
-            if not topic_name:
-                continue
-            print(f"You've chosen: {topic_name}")
-            print("Available statuses are: new, in progress, exam prep, finished.")
-            new_status = input("Please enter new status for your topic: ")
-            changed, reason = topics.change_topic_status(data, topic_name, new_status)
-            if changed:
-                print("Status changed!")
-                menu_utils.print_numbered_topics_with_details(data)
-            elif reason == "invalid status":
-                print("Invalid status!\n")
 
         elif topics_choice == "Add new note":
             print("You've chosen to add a note to the topic.")
