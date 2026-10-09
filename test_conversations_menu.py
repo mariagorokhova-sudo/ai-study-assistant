@@ -6,41 +6,44 @@ import openai
 
 def test_conversations_menu_back_option():
     data = {"topics": [], "conversations": []}
-    with patch("builtins.input", side_effect=["6"]):
+    with patch("builtins.input", side_effect=["3"]):
         conversations_menu.manage_conversations_menu(data)
 
 
-def test_view_history_invalid_input():
-    data = {"topics": [],  "conversations": []}
-    with patch("builtins.input", side_effect = ["1", "7", "6"]):
-        with patch("builtins.print") as mock_print:
-            conversations_menu.manage_conversations_menu(data)
-            mock_print.assert_any_call("Invalid option!\n")
-
-
-@pytest.mark.parametrize("wrong_choice", ["abc", "0", "99"])
-def test_view_history_by_topic_wrong_topic_choice(wrong_choice):
+def test_conversations_menu_does_not_change_data():
     data = {
-        "topics": [], 
+        "topics": [],
         
         "conversations": [
-            {
-                "topic": "recursion", 
-                "ai_mode": "socratic tutor", 
-                "messages": [
-                    {"role": "user",
-                    "content": "What is recursion?"},
-                    {"role": "assistant",
-                    "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+                {
+            "topic": "recursion", 
+            "ai_mode": "socratic tutor", 
+            "messages": [
+                {"role": "user",
+                "content": "What is base case?"},
+                {"role": "assistant",
+                "content": "Base case is ..."},
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["2", wrong_choice, "6"]):
-        with patch("conversations_menu.conversations.get_conversations_by_topic") as mock_conversations:
+    original_conversations = data["conversations"].copy()
+    with patch("builtins.input", side_effect = ["1", "2", "3"]):
 
+        conversations_menu.manage_conversations_menu(data)
+
+        assert data["conversations"] == original_conversations
+
+
+def test_conversations_menu_invalid_conversation_choice():
+    data = {"topics": [],  "conversations": []}
+    with patch("builtins.input", side_effect = ["1", "7", "3"]):
+        with patch("builtins.print") as mock_print:
             conversations_menu.manage_conversations_menu(data)
-
-            mock_conversations.assert_not_called()
+            mock_print.assert_any_call("Invalid option!\n")
 
 
 def test_conversations_menu_print_numbered_conversations():
@@ -63,55 +66,14 @@ def test_conversations_menu_print_numbered_conversations():
             }
         ]
     }
-
-    with patch("builtins.input", side_effect=["1", "6"]):
+    with patch("builtins.input", side_effect=["1", "1", "3"]):
         with patch("conversations_menu.menu_utils.print_numbered_conversations") as mock_numbered_print:
-
-            conversations_menu.manage_conversations_menu(data)
-
-            mock_numbered_print.assert_called_once_with(data["conversations"], include_new_option=False)
-
-
-def test_conversations_menu_print_conversations_topics_list_empty_list():
-    data = {
-        "topics": [],
-        
-        "conversations": []
-    }
-    with patch("builtins.input", side_effect = ["2", "6"]):
-        with patch("conversations_menu.conversations.get_unique_conversations_topics") as mock_topics_list:
-            with patch("builtins.print") as mock_print:
-                mock_topics_list.return_value = []
+            with patch("conversations_menu.manage_conversation_details_menu") as mock_conversation_details:
 
                 conversations_menu.manage_conversations_menu(data)
 
-                mock_print.assert_any_call("No conversations yet!\n")
-
-
-def test_conversations_menu_view_history_on_specific_topic():
-    data = {
-        "topics": [],
-        
-        "conversations": [
-            {
-                "topic": "recursion", 
-                "ai_mode": "socratic tutor", 
-                "messages": [
-                    {"role": "user",
-                    "content": "What is base case?"},
-                    {"role": "assistant",
-                    "content": "Base case is ..."}
-                ]
-            }
-        ]
-    }
-
-    with patch("builtins.input", side_effect = ["2", "1", "1", "6"]):
-        with patch("conversations_menu.menu_utils.print_all_conversation_messages") as mock_print_all_messages:
-
-            conversations_menu.manage_conversations_menu(data)
-
-            mock_print_all_messages.assert_called_once_with(data["conversations"][0])
+                mock_numbered_print.assert_called_once_with(data["conversations"], include_back_option=True)
+                mock_conversation_details.assert_called_once_with(data, data["conversations"][0])
 
 
 def test_conversations_menu_view_conversations_counts():
@@ -149,7 +111,7 @@ def test_conversations_menu_view_conversations_counts():
         ]
     }
 
-    with patch("builtins.input", side_effect = ["3", "6"]):
+    with patch("builtins.input", side_effect = ["2", "3"]):
         with patch("conversations_menu.conversations.count_conversations_by_topic") as mock_count:
             with patch("conversations_menu.conversations.sort_conversations_counts_descending") as mock_sort:
                 with patch("builtins.print") as mock_print:
@@ -173,7 +135,7 @@ def test_conversations_menu_view_conversations_counts_empty_conversations():
          
         "conversations": []
     }
-    with patch("builtins.input", side_effect = ["3", "6"]):
+    with patch("builtins.input", side_effect = ["2", "3"]):
         with patch("conversations_menu.conversations.count_conversations_by_topic") as mock_count:
             with patch("conversations_menu.conversations.sort_conversations_counts_descending") as mock_sort:
                 with patch("builtins.print") as mock_print:
@@ -185,7 +147,9 @@ def test_conversations_menu_view_conversations_counts_empty_conversations():
                     mock_sort.assert_not_called()
 
 
-def test_conversations_menu_delete_conversation_success():
+
+
+def test_manage_conversation_details_menu_back():
     data = {
         "topics": [],
         "conversations": [
@@ -197,40 +161,16 @@ def test_conversations_menu_delete_conversation_success():
                 "content": "What is recursion?"},
                 {"role": "assistant",
                 "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
-            },
-            {
-            "topic": "Recursion",
-            "ai_mode": "Debugger",
-            "messages": [
-                {"role": "user",
-                "content": "Question on debugging?"},
-                {"role": "assistant",
-                "content": "Answer on debugging"}]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["5", "1", "y", "6"]):
-        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
-            with patch("builtins.print") as mock_print:
-                mock_delete.return_value = (True, "deleted")
+    with patch("builtins.input", side_effect = ["6"]) as mock_input:
+        conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
-                conversations_menu.manage_conversations_menu(data)
-
-                mock_delete.assert_called_once_with(data, 0)
-                mock_print.assert_any_call("Conversation deleted!\n")
+        mock_input.assert_called_once()
 
 
-def test_conversations_menu_delete_conversation_empty_list():
-    data = {"topics": [], "conversations": []}
-    with patch("builtins.input", side_effect = ["5", "6"]):
-        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
-
-            conversations_menu.manage_conversations_menu(data)
-
-            mock_delete.assert_not_called()
-
-
-def test_conversations_menu_delete_conversation_invalid_choice():
+def test_manage_conversation_details_view_full_conversation():
     data = {
         "topics": [],
         "conversations": [
@@ -242,28 +182,55 @@ def test_conversations_menu_delete_conversation_invalid_choice():
                 "content": "What is recursion?"},
                 {"role": "assistant",
                 "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
-            },
-            {
-            "topic": "Recursion",
-            "ai_mode": "Debugger",
-            "messages": [
-                {"role": "user",
-                "content": "Question on debugging?"},
-                {"role": "assistant",
-                "content": "Answer on debugging"}]
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["5", "3", "6"]):
-        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
+    with patch("builtins.input", side_effect = ["1", "6"]):
+        with patch("conversations_menu.menu_utils.print_all_conversation_messages") as mock_print_messages:
+            
+            conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
-            conversations_menu.manage_conversations_menu(data)
-
-            mock_delete.assert_not_called()
+            mock_print_messages.assert_called_once_with(data["conversations"][0])
 
 
-def test_conversations_menu_summarize_conversation_success():
+def test_manage_conversation_details_continue_conversation():
     data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["2", "Why do we need a base case?", "/exit", "6"]):
+        with patch("conversations_menu.ai.ask_about_topic", return_value = "Without one the function will call itself forever.") as mock_ask:
+            with patch("conversations_menu.conversations.add_message_to_conversation") as mock_add_message:
+                with patch("conversations_menu.conversations.save_conversation") as mock_save:
+
+                    conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                    mock_ask.assert_called_once_with(data["conversations"][0], data["topics"][0]["notes"])
+                    mock_add_message.assert_has_calls([call(data["conversations"][0], "user", "Why do we need a base case?"),
+                                                       call(data["conversations"][0], "assistant", "Without one the function will call itself forever.")])
+                    mock_save.assert_called_once_with(data)
+
+
+def test_manage_conversations_details_continue_conversation_api_error():
+    data = {
+        "courses": [],
         "topics": [
             {
                 "name": "Recursion",
@@ -283,21 +250,229 @@ def test_conversations_menu_summarize_conversation_success():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "6"]):
-        with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
-            with patch("conversations_menu.topics.add_note") as mock_add_note:
-                with patch("builtins.print") as mock_print:
-                    mock_summary.return_value = "Recursion solves a problem by reducing it to smaller instances."
-                    mock_add_note.return_value = (True, "added")
+    with patch("builtins.input", side_effect = ["2", "Why do we need a base case?", "/exit", "6"]):
+        with patch("conversations_menu.ai.ask_about_topic") as mock_ask:
+            with patch("conversations_menu.conversations.save_conversation"):
+                request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                mock_ask.side_effect = openai.APIConnectionError(request=request)
 
-                    conversations_menu.manage_conversations_menu(data)
+                conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                assert data["conversations"][0]["messages"] == [
+                    {"role": "user",
+                    "content": "What is recursion?"},
+                    {"role": "assistant",
+                    "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}
+                ]
+
+
+
+def test_manage_conversation_details_start_new_conversation_same_topic():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["3", "1", "Why do we need a base case?", "/exit", "6"]):
+        with patch("conversations_menu.conversations.create_conversation") as mock_create:
+            with patch("conversations_menu.ai.ask_about_topic", return_value = "Without one the function will call itself forever.") as mock_ask:
+                with patch("conversations_menu.conversations.add_message_to_conversation") as mock_add_message:
+                    with patch("conversations_menu.conversations.save_conversation") as mock_save:
+
+                        mock_create.return_value = {
+                            "topic": "Recursion",
+                            "ai_mode": "Tutor",
+                            "messages": []
+                        }
+
+                        conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                        mock_create.assert_called_once_with(data, "Recursion", "Tutor")
+                        mock_ask.assert_called_once_with(mock_create.return_value, data["topics"][0]["notes"])
+                        mock_add_message.assert_has_calls([call(mock_create.return_value, "user", "Why do we need a base case?"),
+                                                       call(mock_create.return_value, "assistant", "Without one the function will call itself forever.")])
+                        mock_save.assert_called_once_with(data)
+
+
+def test_manage_conversation_details_start_new_conversatio_no_question():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["3", "1", "/exit", "6"]):
+        with patch("conversations_menu.conversations.create_conversation") as mock_create:
+
+            conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+            mock_create.assert_not_called()
+            assert data["conversations"] == [
+                {
+                "topic": "Recursion",
+                "ai_mode": "Socratic tutor",
+                "messages": [
+                    {"role": "user",
+                    "content": "What is recursion?"},
+                    {"role": "assistant",
+                    "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+                }
+            ]
+
+
+def test_manage_conversation_details_start_new_conversatio_api_error():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["3", "1", "Why do we need a base case?", "/exit", "6"]):
+        with patch("conversations_menu.ai.ask_about_topic") as mock_ask:
+            with patch("conversations_menu.conversations.save_conversation"):
+                request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+                mock_ask.side_effect = openai.APIConnectionError(request=request)
+
+                conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                assert data["conversations"] == [
+                    {
+                    "topic": "Recursion",
+                    "ai_mode": "Socratic tutor",
+                    "messages": [
+                        {"role": "user",
+                        "content": "What is recursion?"},
+                        {"role": "assistant",
+                        "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+                    }
+                ]
+
+
+def test_manage_conversation_details_start_new_conversatio_openai_api_key_missing():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["3", "1", "Why do we need a base case?"]):
+        with patch("conversations_menu.ai.ask_about_topic") as mock_ask:
+            mock_ask.side_effect = ValueError("OPENAI_API_KEY is missing")
+
+            conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+            assert data["conversations"] == [
+                {
+                "topic": "Recursion",
+                "ai_mode": "Socratic tutor",
+                "messages": [
+                    {"role": "user",
+                    "content": "What is recursion?"},
+                    {"role": "assistant",
+                    "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+                }
+            ]
+
+
+def test_manage_conversation_details_summarize_conversation():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": []
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["4", "6"]):
+        with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
+            with patch("conversations_menu.topics.add_note") as mock_note:
+                with patch("builtins.print") as mock_print:
+                    mock_summary.return_value = "Summarized conversation about recursion."
+                    mock_note.return_value = (True, "added")
+
+                    conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
                     mock_summary.assert_called_once_with(data["conversations"][0])
-                    mock_add_note.assert_called_once_with(data, "Recursion", mock_summary.return_value)
+                    mock_note.assert_called_once_with(data, "Recursion", mock_summary.return_value)
+                    mock_print.assert_any_call(f"\nThe following summary was created: \nSummarized conversation about recursion.\n")
                     mock_print.assert_any_call("Conversation summary added as a note!")
 
 
-def test_conversations_menu_summarize_conversation_no_summary():
+def test_manage_conversation_details_summarize_conversation_no_summary():
     data = {
         "topics": [],
         "conversations": [
@@ -312,31 +487,19 @@ def test_conversations_menu_summarize_conversation_no_summary():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "6"]):
+    with patch("builtins.input", side_effect = ["4", "6"]):
         with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
             with patch("conversations_menu.topics.add_note") as mock_add_note:
                 with patch("builtins.print") as mock_print:
                     mock_summary.return_value = None
 
-                    conversations_menu.manage_conversations_menu(data)
+                    conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
                     mock_add_note.assert_not_called()
                     mock_print.assert_any_call("Cannot summarize an empty conversation!\n")
 
 
-def test_conversations_menu_summarize_conversation_no_conversations():
-    data = {"topics": [], "conversations": []}
-    with patch("builtins.input", side_effect = ["4", "6"]):
-        with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
-            with patch("conversations_menu.topics.add_note") as mock_add_note:
-
-                conversations_menu.manage_conversations_menu(data)
-
-                mock_summary.assert_not_called()
-                mock_add_note.assert_not_called()
-
-
-def test_conversations_menu_summarize_conversation_no_topic():
+def test_manage_conversation_details_summarize_conversation_no_topic():
     data = {
         "topics": [],
         "conversations": [
@@ -351,19 +514,19 @@ def test_conversations_menu_summarize_conversation_no_topic():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "6"]):
+    with patch("builtins.input", side_effect = ["4", "6"]):
         with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
             with patch("conversations_menu.topics.add_note") as mock_add_note:
                 with patch("builtins.print") as mock_print:
                     mock_summary.return_value = "Recursion solves a problem by reducing it to smaller instances."
                     mock_add_note.return_value = (False, "topic not found")
 
-                    conversations_menu.manage_conversations_menu(data)
+                    conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
                     mock_print.assert_any_call("Topic not found, cannot add a note!\n")
 
 
-def test_create_summary_ai_api_error():
+def test_manage_conversation_details_create_summary_ai_api_error():
     data = {
         "topics": [],
         "conversations": [
@@ -378,20 +541,20 @@ def test_create_summary_ai_api_error():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "6"]) as mock_input:
+    with patch("builtins.input", side_effect = ["4", "6"]) as mock_input:
         with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
             with patch("conversations_menu.topics.add_note") as mock_add_note:
                 with patch("builtins.print") as mock_print:
                     request = httpx.Request("POST", "https://api.openai.com/v1/responses")
                     mock_summary.side_effect = openai.APIConnectionError(request=request)
 
-                    conversations_menu.manage_conversations_menu(data)
+                    conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
                     mock_print.assert_any_call("Sorry, the AI request failed. Please try again.")
                     mock_add_note.assert_not_called()
 
 
-def test_create_summary_missing_api_key():
+def test_manage_conversation_details_create_summary_missing_api_key():
     data = {
         "topics": [],
         "conversations": [
@@ -406,11 +569,76 @@ def test_create_summary_missing_api_key():
             }
         ]
     }
-    with patch("builtins.input", side_effect = ["4", "1", "6"]) as mock_input:
+    with patch("builtins.input", side_effect = ["4", "6"]) as mock_input:
         with patch("conversations_menu.ai.summarize_conversation") as mock_summary:
             with patch("builtins.print") as mock_print:
                 mock_summary.side_effect = ValueError("OPENAI_API_KEY is missing")
 
-                conversations_menu.manage_conversations_menu(data)
+                conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
 
                 mock_print.assert_any_call("OPENAI_API_KEY is missing. Please add it to the .env file.")
+
+
+def test_manage_conversation_details_delete_conversation():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": []
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["5", "y"]):
+        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
+            with patch("builtins.print") as mock_print:
+                mock_delete.return_value = (True, "deleted")
+
+                conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                mock_delete.assert_called_once_with(data, 0)
+                mock_print.assert_any_call("Conversation deleted!\n")
+
+
+def test_manage_conversation_details_delete_conversation_no_confirmation():
+    data = {
+        "courses": [],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": []
+            }
+        ],
+        "conversations": [
+            {
+            "topic": "Recursion",
+            "ai_mode": "Socratic tutor",
+            "messages": [
+                {"role": "user",
+                "content": "What is recursion?"},
+                {"role": "assistant",
+                "content": "**Recursion** is when a function calls itself to solve a smaller version of the same problem."}]
+            }
+        ]
+    }
+    with patch("builtins.input", side_effect = ["5", "n", "6"]):
+        with patch("conversations_menu.conversations.delete_conversation") as mock_delete:
+            with patch("builtins.print") as mock_print:
+
+                conversations_menu.manage_conversation_details_menu(data, data["conversations"][0])
+
+                mock_delete.assert_not_called()
+                mock_print.assert_any_call("Conversation is not deleted!\n")

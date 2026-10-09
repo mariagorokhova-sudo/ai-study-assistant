@@ -26,7 +26,7 @@ def manage_ai_menu(data):
 
     topic_notes = topics.get_notes(data, topic_name)
     conversations_list = conversations.get_conversations_by_topic(data, topic_name)
-    menu_utils.print_numbered_conversations(conversations_list)
+    menu_utils.print_numbered_conversations(conversations_list, include_new_option=True)
     conversation_entry = menu_utils.choose_from_numbered_list(conversations_list, include_other_option=True, prompt="Please choose an option to continue or start a new conversation: ")
 
     if conversation_entry is None:

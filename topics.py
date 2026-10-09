@@ -1,4 +1,5 @@
 import storage
+import conversations
 
 def load_data():
     return storage.load_data()
@@ -129,14 +130,16 @@ def unassign_topic_from_course(data, topic_name, course_code):
 
 def get_topics_for_course(data, course_code):
     course_code = course_code.strip().upper()
+    statuses_list = ["learning", "exam prep", "finished"]
     topics_list = []
-    for entry in data["topics"]:
-        if course_code in entry.get("course_statuses", {}):
-            topics_list.append(entry)
+    for status in statuses_list:
+        for entry in data["topics"]:
+            if (entry.get("course_statuses", {})).get(course_code) == status:
+                topics_list.append(entry)
     return topics_list
 
 
-def show_topics_for_course(data, course_code):
+def show_topics_for_course(data, course_code, include_back=False):
     if not data["topics"]:
         print("No topics yet!\n")
         return
@@ -148,9 +151,48 @@ def show_topics_for_course(data, course_code):
     statuses = ("learning", "exam prep", "finished")
     topic_number = 1
     for status in statuses:
+        if not any(
+            topic["course_statuses"][course_code] == status
+            for topic in course_topics
+        ):
+           continue 
         print(f'{status}:')
         for topic in course_topics:
             if topic["course_statuses"][course_code] == status:
                 print(f'{topic_number}. {topic["name"]}')
                 topic_number += 1
+                print()
+    if include_back:
+        print(f'{topic_number}. Back')
         print()
+
+
+def show_topic_card(data, topic_entry):
+    print("\n==============================================")
+    print(f'Topic: {topic_entry["name"]}')
+    print("==============================================\n")
+    if not topic_entry["course_statuses"]:
+        print("Courses: not assigned!\n")
+    else:
+        print("Courses:\n")
+        for course_code, status in topic_entry["course_statuses"].items():
+            for course in data["courses"]:
+                if course["code"].lower() == course_code.lower():
+                    print(f'{course_code} - {course["name"]} - status: {status}.')
+    print("-----------------------------------------------------------------------------------")
+    print(f'Notes: {len(topic_entry["notes"])}\n')
+    for note in topic_entry["notes"]:
+        print(f'- {note[:30]}...')
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("-----------------------------------------------------------------------------------")
+    conversations_count = 0
+    conversations_list = []
+    for conversation in data["conversations"]:
+        if conversation["topic"].lower() == topic_entry["name"].lower():
+            conversations_count += 1
+            conversations_list.append(conversation)
+    print(f'Conversations: {conversations_count}\n')
+    for conversation in conversations_list:
+        last_user_message = conversations.get_last_user_message(conversation)
+        print(f'Topic: {conversation["topic"]} | AI mode: {conversation["ai_mode"]} | Last question: {last_user_message}')
+        print("-----------------------------------------------------------------------------------")

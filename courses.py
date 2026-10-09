@@ -100,4 +100,3 @@ def show_course_card(data, course_entry):
     print(f'learning: {learning_count}')
     print(f'exam prep: {exam_prep_count}')
     print(f'finished: {finished_count}')
-    print("\n=================================\n")

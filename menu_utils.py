@@ -1,8 +1,10 @@
 import conversations
 
-def print_numbered_list(options_list, include_other_option=False):
+def print_numbered_list(options_list, include_other_option=False, separator=False):
     for number, option in enumerate(options_list, start=1):
         print(f"{number}. {option}")
+        if separator:
+            print("...................................................................................")
     if include_other_option:
         last_option = len(options_list)+1
         print(f"{last_option}. Other\n")
@@ -33,9 +35,9 @@ def choose_from_numbered_list(options_list, include_other_option=False, prompt="
         return options_list[user_choice-1]
 
 
-def print_numbered_topics_with_details(data):
+def print_numbered_topics(data, include_back_option=False):
     print("\n===================================================================================")
-    print("Current list of topics with details:")
+    print("Current list of topics")
     print("===================================================================================\n")
     for number, topic_details in enumerate(data["topics"], start=1):
         print(f'{number}. {topic_details["name"]}\n')
@@ -53,16 +55,24 @@ def print_numbered_topics_with_details(data):
         else:
             print(f'Notes:')
             for note in topic_details["notes"]:
-                print(f'- {note}')
-                print("...................................................................................")
+                print(f'- {note[:30]}...')
+                print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
             print("-----------------------------------------------------------------------------------")
+    if include_back_option:
+        print(f'{len(data["topics"]) + 1}. Back')
+        print()
 
 
-def print_numbered_conversations(conversations_list, include_new_option=True):
+def print_numbered_conversations(conversations_list, include_new_option=False, include_back_option=False):
     if not conversations_list:
         print("No conversations yet!\n")
         if include_new_option:
             print("1. Start new conversation\n")
+            if include_back_option:
+                print("2. Back\n")
+        else:
+            if include_back_option:
+                print("1. Back\n")
         return
     print("\n===================================================================================")
     print("Current list of conversations:")
@@ -72,9 +82,13 @@ def print_numbered_conversations(conversations_list, include_new_option=True):
         print(f'{number}. Topic: {conversation["topic"]} | AI mode: {conversation["ai_mode"]} | Last question: {last_user_message}')
         print("-----------------------------------------------------------------------------------\n")
     if include_new_option:
-        last_option = len(conversations_list)+1
         print("============================== or you can =========================================\n")
-        print(f'{last_option}. Start new conversation\n')
+        print(f'{len(conversations_list)+1}. Start new conversation\n')
+        if include_back_option:
+            print("============================== or you can =========================================\n")
+            print(f'{len(conversations_list)+2}. Go back\n')
+    elif include_back_option:
+        print(f'{len(conversations_list)+1}. Back\n')
 
 
 def print_all_conversation_messages(conversation_entry):

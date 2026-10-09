@@ -1,6 +1,27 @@
 import courses_menu
 from unittest.mock import patch
 import pytest
+import topics_menu
+
+def test_courses_menu_does_not_change_courses_data():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "October 2026 - May 2027",
+                "status": "active"
+            }
+        ],
+        "topics": [],
+        "conversations": []
+    }
+    original_courses = data["courses"].copy()
+    with patch("builtins.input", side_effect = ["3"]):
+
+        courses_menu.manage_courses_menu(data)
+
+        assert data["courses"] == original_courses
 
 
 def test_manage_courses_menu_back():
@@ -126,13 +147,63 @@ def test_manage_courses_menu_view_topics():
         ],
         "conversations": []
     }
-    with patch("builtins.input", side_effect = ["1", "1", "8", "3"]):
+    with patch("builtins.input", side_effect = ["1", "1", "5", "8", "3"]):
         with patch("courses_menu.courses.show_course_card") as mock_show_card:
             with patch("courses_menu.topics.show_topics_for_course") as mock_show_topics:
 
                 courses_menu.manage_courses_menu(data)
 
-                mock_show_topics.assert_called_once_with(data, "CM1035-01")
+                mock_show_topics.assert_called_once_with(data, "CM1035-01", include_back=True)
+
+
+def test_manage_courses_menu_view_topics_manage_topic_details():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {"CM1035-01": "exam prep"},
+                "notes": ["Inheritance is an important concept."]
+            },
+            {
+                "name": "Binary trees",
+                "course_statuses": {"CM1035-01": "finished"},
+                "notes": ["Binary tree is a..."]
+            },
+            {
+                "name": "Data structures",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["Lists and arrays."]
+            }
+        ],
+        "conversations": []
+    }
+    with patch("builtins.input", side_effect = ["1", "1", "2", "8", "3"]):
+        with patch("courses_menu.courses.show_course_card") as mock_show_card:
+            with patch("courses_menu.topics.show_topics_for_course"):
+                with patch("courses_menu.topics_menu.manage_topic_details_menu") as mock_topic_details:
+
+                    expected_topic = {
+                        "name": "Data structures",
+                        "course_statuses": {"CM1035-01": "learning"},
+                        "notes": ["Lists and arrays."]
+                    }
+
+                    courses_menu.manage_courses_menu(data)
+
+                    mock_topic_details.assert_called_once_with(data, expected_topic)
 
 
 def test_manage_courses_menu_assign_topic_to_course():

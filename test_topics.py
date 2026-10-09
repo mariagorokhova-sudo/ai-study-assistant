@@ -1,5 +1,5 @@
 import topics
-from unittest.mock import patch
+from unittest.mock import patch, call
 import pytest
 
 def test_add_topic():
@@ -1076,6 +1076,66 @@ def test_show_topics_for_course_no_topics_assigned():
         mock_print.assert_any_call("No topics assigned to this course!\n")
 
 
+def test_show_topics_for_course_does_not_print_empty_statuses():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {},
+                "notes": ["Inheritance is an important concept."]
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+        topics.show_topics_for_course(data, "CM1035-01")
+
+        mock_print.assert_any_call("learning:")
+        mock_print.assert_any_call("1. Recursion")
+        assert call("exam prep:") not in mock_print.call_args_list
+        assert call("finished:") not in mock_print.call_args_list
+
+
+def test_show_topics_for_course_include_back_options():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {},
+                "notes": ["Inheritance is an important concept."]
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+
+        topics.show_topics_for_course(data, "CM1035-01", include_back=True)
+        mock_print.assert_any_call("2. Back")
+
 def test_show_topics_for_course_empty_topics():
     data = {
         "courses": [
@@ -1090,6 +1150,96 @@ def test_show_topics_for_course_empty_topics():
         "conversations": []
     }
     with patch("builtins.print") as mock_print:
+
         topics.show_topics_for_course(data, "CM1035-01")
 
         mock_print.assert_any_call("No topics yet!\n")
+
+
+def test_show_topic_card():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {"CM1035-01": "learning"},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {},
+                "notes": ["Inheritance is an important concept."]
+            }
+        ],
+        "conversations": [
+            {
+                "topic": "Recursion",
+                "ai_mode": "Debugger",
+                "messages": [
+                    {"role": "user",
+                    "content": "Question on debugging?"},
+                    {"role": "assistant",
+                    "content": "Answer on debugging"}]
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+
+        topics.show_topic_card(data, data["topics"][0])
+
+        mock_print.assert_any_call("Topic: Recursion")
+        mock_print.assert_any_call("Courses:\n")
+        mock_print.assert_any_call("CM1035-01 - Algorithms and Data Structures I - status: learning.")
+        mock_print.assert_any_call("Notes: 2\n")
+        mock_print.assert_any_call("- base case...")
+        mock_print.assert_any_call("- recursive case...")
+        mock_print.assert_any_call("Conversations: 1\n")
+        mock_print.assert_any_call("Topic: Recursion | AI mode: Debugger | Last question: Question on debugging?")
+
+
+def test_show_topic_card_no_courses():
+    data = {
+        "courses": [
+            {
+                "code": "CM1035-01",
+                "name": "Algorithms and Data Structures I",
+                "session": "January 2026 - May 2026",
+                "status": "active"
+            }
+        ],
+        "topics": [
+            {
+                "name": "Recursion",
+                "course_statuses": {},
+                "notes": ["base case", "recursive case"]
+            },
+            {
+                "name": "Classes",
+                "course_statuses": {},
+                "notes": ["Inheritance is an important concept."]
+            }
+        ],
+        "conversations": [
+            {
+                "topic": "Recursion",
+                "ai_mode": "Debugger",
+                "messages": [
+                    {"role": "user",
+                    "content": "Question on debugging?"},
+                    {"role": "assistant",
+                    "content": "Answer on debugging"}]
+            }
+        ]
+    }
+    with patch("builtins.print") as mock_print:
+
+        topics.show_topic_card(data, data["topics"][0])
+
+        mock_print.assert_any_call("Courses: not assigned!\n")

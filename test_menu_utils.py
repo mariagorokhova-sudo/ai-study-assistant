@@ -39,38 +39,6 @@ def test_choose_from_numbered_list_empty_list():
         mock_print.assert_any_call("No options yet!\n")
 
 
-def test_print_numbered_topics_with_details():
-    data = {
-        "topics": [
-            {
-                "name": "Recursion",
-                "course_statuses": {"CM1005-01": "learning", "CM1035-01": "exam prep"},
-                "notes": ["note 1", "note 2"]
-            },
-            {
-                "name": "classes",
-                "course_statuses": {},
-                "notes": []
-            }
-        ],
-        "conversations": []
-    }
-    with patch("builtins.print") as mock_print:
-        menu_utils.print_numbered_topics_with_details(data)
-
-        mock_print.assert_any_call("1. Recursion\n")
-        mock_print.assert_any_call("Course statuses:")
-        mock_print.assert_any_call("- CM1005-01: learning")
-        mock_print.assert_any_call("- CM1035-01: exam prep")
-        mock_print.assert_any_call("Notes:")
-        mock_print.assert_any_call("- note 1")
-        mock_print.assert_any_call("...................................................................................")
-        mock_print.assert_any_call("- note 2")
-        mock_print.assert_any_call("2. classes\n")
-        mock_print.assert_any_call("Topic is not assigned to any courses.\n")
-        mock_print.assert_any_call("Notes: no notes yet!\n")
-
-
 def test_print_numbered_conversations():
     conversations_list = [{
         "topic": "recursion", 
@@ -83,10 +51,19 @@ def test_print_numbered_conversations():
         }] 
     with patch("builtins.print") as mock_print:
         
-        menu_utils.print_numbered_conversations(conversations_list)
+        menu_utils.print_numbered_conversations(conversations_list, include_new_option=True)
 
         mock_print.assert_any_call("1. Topic: recursion | AI mode: Socratic tutor | Last question: What is recursion?")
         mock_print.assert_any_call("2. Start new conversation\n")
+
+
+def test_print_numbered_conversations_empty_list_with_back():
+    conversations_list = []
+    with patch("builtins.print") as mock_print:
+        menu_utils.print_numbered_conversations(conversations_list, include_back_option=True)
+
+        mock_print.assert_any_call("No conversations yet!\n")
+        mock_print.assert_any_call("1. Back\n")
 
 
 def test_print_numbered_conversations_empty_list():
