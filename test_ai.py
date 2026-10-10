@@ -2,7 +2,8 @@ import ai
 from unittest.mock import patch
 import pytest
 
-def test_ask_about_topic():
+def test_ask_about_topic(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     conversation_entry = {
             "topic": "Recursion",
             "ai_mode": "Tutor",
@@ -116,7 +117,8 @@ def test_unknown_ai_mode():
         ai.build_instructions("Recursion", "Unknown mode")
 
 
-def test_summarize_conversation():
+def test_summarize_conversation(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     conversation_entry = {
         "topic": "Recursion",
         "ai_mode": "Socratic tutor",

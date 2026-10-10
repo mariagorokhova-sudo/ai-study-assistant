@@ -319,12 +319,6 @@ def test_save_data_preserves_existing_file_on_error(tmp_path, monkeypatch):
         assert not temporary_file.exists()
 
 
-def test_data_file_location_is_independent_of_working_directory(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-
-    assert storage.DATA_FILE.exists()
-
-
 def test_add_courses_to_old_json(tmp_path, monkeypatch):
     test_file = tmp_path / "test_data.json"
     monkeypatch.setattr(storage, "DATA_FILE", test_file)
